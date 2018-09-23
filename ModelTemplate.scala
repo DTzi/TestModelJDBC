@@ -10,18 +10,18 @@ class ModelTemplate extends Model {
     Class.forName("org.postgresql.Driver");
 
     var con = DriverManager.getConnection("jdbc:postgresql://localhost:-/dbname","postgres", "User")
-    var databaseMetaData = con.getMetaData();//Get Column_Names.
+    var databaseMetaData = con.getMetaData();//Get Column_Names. Use it for pks,fks,datatype,joins.
 
     var table = ""//tablename
-    val random_columns = scala.util.Random//replace with modbat's built_in function  def chooseName(i: Int) = {
-    //parameterName(choose(0, i))}
+    val random_columns = scala.util.Random/* Random number of Columns, replace with modbat's built_in function  def chooseName(i: Int) = {
+    parameterName(choose(0, i))} */
 
     val random_tables = scala.util.Random
-    var a = random_columns.nextInt(9)//table names
+    var a = random_columns.nextInt(9)//random number of Tables.
     System.out.println(a)
     var counter = 0
     var col = 0
-    var colArray = Vector[Int]()//vector, remember the random_numbers to use them later.
+    var colArray = Vector[Int]()//Use the vector to remember the random_numbers to use them later.
 
     def create_table{
 
@@ -84,11 +84,11 @@ class ModelTemplate extends Model {
               table = "table"+counter
               var str2 = table
               var strr = str1.concat(str2)//get the String Query <INSERT INTO TABLE VALUES>
-              System.out.println(strr)//// DEBUG:
+              //System.out.println(strr) DEBUG:
               var query = strr +
                        " VALUES " + sample
 
-                        System.out.println(query)//// DEBUG:
+                      //  System.out.println(query) DEBUG:
                       //  var st = con.prepareStatement("INSERT INTO table16 VALUES (?)");
                       var st = con.prepareStatement(query)
                       // var p=con.prepareStatement(st);
@@ -96,7 +96,7 @@ class ModelTemplate extends Model {
                       var d = 0
                       for(d<-1 to x){
 
-                          st.setString(1 + d, "Hello World.")//get random integer/strin.
+                          st.setString(1 + d, "Hello World.")//get random integer/string.
                           System.out.println(2 + d)
 
                         }
@@ -104,11 +104,11 @@ class ModelTemplate extends Model {
                         var rs=st.executeUpdate()
 
 
-  //create named_prepared_statement
+                        //create named_prepared_statement
                 }
 
               }
-              //TODO: Add trans. for PKS, FKS, ChangeDataType, Joins
+              //TODO: Add transitions for PKS, FKS, ChangeDataType, Joins and other Queries.
   "one" -> "two" :=create_table
   "two" -> "three" :=add_columns
   "three" -> "four" :=add_data
