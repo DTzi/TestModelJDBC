@@ -108,8 +108,21 @@ class ModelTemplate extends Model {
                 }
 
               }
+
+    def drop_table{
+        //drop tables for multiple tests.
+        for(x <- 1 to a){
+
+          table = "table"+x
+          var dropTable = con.createStatement ()
+          dropTable.executeUpdate ("DROP TABLE " + table)
+                        }
+                    }
+
               //TODO: Add transitions for PKS, FKS, ChangeDataType, Joins and other Queries.
   "one" -> "two" :=create_table
   "two" -> "three" :=add_columns
   "three" -> "four" :=add_data
+  "four" -> "five" :=drop_table
+
 }
