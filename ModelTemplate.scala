@@ -11,6 +11,7 @@ class ModelTemplate extends Model {
 
     var con = DriverManager.getConnection("jdbc:postgresql://localhost:-/dbname","postgres", "User")
     var databaseMetaData = con.getMetaData();//Get Column_Names. Use it for pks,fks,datatype,joins.
+    var stat = con.createStatement();
 
     var table = ""//tablename
     val random_columns = scala.util.Random/* Random number of Columns, replace with modbat's built_in function  def chooseName(i: Int) = {
@@ -63,6 +64,45 @@ class ModelTemplate extends Model {
           }
         }
       }
+
+      def add_pks{
+
+        counter = 0//set an upper limit for tables, check it through the vector.
+        for(x<- colArray){
+
+          var pk_change = con.createStatement();
+          //Have to use if-else statement, due to exception (Bound must be positive).
+          if (x != 0) {
+            pkcol = random_columns.nextInt(x)//assign random_number according to the number of columns.
+            }
+            else{
+              pkcol = 0
+            }
+
+            counter+=1
+            table = "table"+counter//tableName
+            var str_pk = "Alter table "
+            var str_pk2 = table
+            var str_pkc = str_pk.concat(str_pk2)// Query -> Alter table tableName
+            //System.out.println(str_pkc)
+            var str_pk3 = " Add primary key"
+            var str_pkcc = str_pkc.concat(str_pk3)// Query -> Alter table tableName Add primary key
+            var str_pkcol = " (Column"+pkcol+")"//Get columnName
+            var complete_add_pks = str_pkcc.concat(str_pkcol)// Query -> Alter table tableName Add primary key ColumnName
+
+            stat.executeUpdate(complete_add_pks);
+
+            /*Get Pks and verify they are correctly assigned to the table. Use an extra Method for that
+            to use later for joins and ChangeDataType*/
+            var PK = databaseMetaData.getPrimaryKeys(null,null, table);
+            System.out.println("------------PRIMARY KEYS-------------");
+            while(PK.next())
+            {
+              System.out.println(PK.getString("COLUMN_NAME") + "===" + PK.getString("PK_NAME"));
+            }
+
+      }
+  }
 
     def add_data{
       counter = 0//set an upper limit for tables, check it through the vector.
@@ -120,9 +160,10 @@ class ModelTemplate extends Model {
                     }
 
               //TODO: Add transitions for PKS, FKS, ChangeDataType, Joins and other Queries.
-  "one" -> "two" :=create_table
-  "two" -> "three" :=add_columns
-  "three" -> "four" :=add_data
-  "four" -> "five" :=drop_table
+    "Init" -> "tables" :=create_table
+    "tables" -> "columns" :=add_columns
+    "columns" -> "primary keys" :=add_pks
+    "primary keys" -> "data" :=add_data
+    "data" -> "delete tables" :=drop_table
 
 }
