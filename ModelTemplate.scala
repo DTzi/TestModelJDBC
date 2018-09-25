@@ -70,7 +70,6 @@ class ModelTemplate extends Model {
         counter = 0//set an upper limit for tables, check it through the vector.
         for(x<- colArray){
 
-          var pk_change = con.createStatement();
           //Have to use if-else statement, due to exception (Bound must be positive).
           if (x != 0) {
             pkcol = random_columns.nextInt(x)//assign random_number according to the number of columns.
@@ -90,16 +89,16 @@ class ModelTemplate extends Model {
             var str_pkcol = " (Column"+pkcol+")"//Get columnName
             var complete_add_pks = str_pkcc.concat(str_pkcol)// Query -> Alter table tableName Add primary key ColumnName
 
-            stat.executeUpdate(complete_add_pks);
+            stat.executeUpdate(complete_add_pks)
 
             /*Get Pks and verify they are correctly assigned to the table. Use an extra Method for that
-            to use later for joins and ChangeDataType*/
-            var PK = databaseMetaData.getPrimaryKeys(null,null, table);
-            System.out.println("------------PRIMARY KEYS-------------");
+            to use later for joins and ChangeDataType
+            var PK = databaseMetaData.getPrimaryKeys(null,null, table)
+            System.out.println("------------PRIMARY KEYS-------------")
             while(PK.next())
             {
-              System.out.println(PK.getString("COLUMN_NAME") + "===" + PK.getString("PK_NAME"));
-            }
+              System.out.println(PK.getString("COLUMN_NAME") + "===" + PK.getString("PK_NAME"))
+            }*/
 
       }
   }
