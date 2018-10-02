@@ -13,16 +13,22 @@ class ModelTemplate extends Model {
     var databaseMetaData = con.getMetaData();//Get Column_Names. Use it for pks,fks,datatype,joins.
     var stat = con.createStatement();
 
+    //Use the list to get random Strings. TODO Have lists for specific columns NAMES, CITIES, SALARY ETC.
+    val A = List("String1", "String2", "String3",
+    "String4", "String5", "String6", "String7", "String8")
+
     var table = ""//tablename
     val random_columns = scala.util.Random/* Random number of Columns, replace with modbat's built_in function  def chooseName(i: Int) = {
     parameterName(choose(0, i))} */
 
     val random_tables = scala.util.Random
+    //var a = random_columns.nextInt(6) + 5, use for certain limits
     var a = random_columns.nextInt(9)//random number of Tables.
-    System.out.println(a)
+    //System.out.println(a)
     var counter = 0
     var col = 0
     var colArray = Vector[Int]()//Use the vector to remember the random_numbers to use them later.
+    var pkcol = 0
 
     def create_table{
 
@@ -31,7 +37,7 @@ class ModelTemplate extends Model {
         table = "table"+x
         var createTable = con.createStatement ()
              createTable.executeUpdate ("CREATE TABLE " + table
-                 + "(id INTEGER )")
+                 + "(column0 INTEGER )")
             }
           }
 
@@ -131,22 +137,31 @@ class ModelTemplate extends Model {
                       //  var st = con.prepareStatement("INSERT INTO table16 VALUES (?)");
                       var st = con.prepareStatement(query)
                       // var p=con.prepareStatement(st);
-                      st.setInt(1,331)//Get random integer/string.
                       var d = 0
-                      for(d<-1 to x){
+                      var count = 0
 
-                          st.setString(1 + d, "Hello World.")//get random integer/string.
-                          System.out.println(2 + d)
+                      for(d<-1 to 5){//Number of Rows. Could be random.
 
+                          st.setInt(1,d)//First Column.
+
+                        for(f<-1 to x){//And here Insert for the rest of the Columns.
+                          var random_string = A(Random.nextInt(A.size))//Get Random Strings from the List.
+                          st.setString(1 + f, random_string)//Random string for each column.
                         }
+                          st.addBatch()//This makes the trick for efficient "insert into Multiple Rows".
+                          count += 1
+                          if (count % 10 == 0){
+                          //System.out.println("hi there!")
+                          st.executeBatch()
+                              }
 
                         var rs=st.executeUpdate()
 
+                      }
 
-                        //create named_prepared_statement
-                }
+                   }
 
-              }
+               }
 
     def drop_table{
         //drop tables for multiple tests.
