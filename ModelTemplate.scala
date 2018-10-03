@@ -142,10 +142,12 @@ class ModelTemplate extends Model {
 
                       for(d<-1 to 5){//Number of Rows. Could be random.
 
-                          st.setInt(1,d)//First Column.
+                        st.setInt(1,d)//First Column.
 
                         for(f<-1 to x){//And here Insert for the rest of the Columns.
                           var random_string = A(Random.nextInt(A.size))//Get Random Strings from the List.
+                          //var random_string = s"first_name_${Random.alphanumeric take 10}" -> Get True random strings.
+                          //var random_string = "string" + r.nextInt(100) Get Strings with enumeration.
                           st.setString(1 + f, random_string)//Random string for each column.
                         }
                           st.addBatch()//This makes the trick for efficient "insert into Multiple Rows".
@@ -173,6 +175,35 @@ class ModelTemplate extends Model {
                         }
                     }
 
+    def change_dataType{
+
+        counter = 0//set an upper limit for tables, check it through the vector.
+
+          for(x <- colArray) {
+            if (x != 0) {
+            pkcol = random_columns.nextInt(x)//assign random_number according to the number of columns.
+                }
+            else{
+              pkcol = 0
+              }
+
+            counter+=1
+            table = "table"+counter
+            var string1 = "ALTER table "+table
+            //System.out.println(string1)
+            var string2 = " ALTER COLUMN " + "column" + pkcol
+            var string3 = string1.concat(string2)
+            //System.out.println(string3)
+            var string4 = " TYPE INT"
+            var final_string = string3.concat(string4)
+            //System.out.println(final_string)
+            var string5 = " USING " + "column" + pkcol + " ::integer"
+            var final_ = final_string.concat(string5)
+            //System.out.println(final_)
+            stat.executeUpdate(final_)
+
+                    }
+              }
               //TODO: Add transitions for PKS, FKS, ChangeDataType, Joins and other Queries.
     "Init" -> "tables" :=create_table
     "tables" -> "columns" :=add_columns
