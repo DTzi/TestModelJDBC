@@ -209,6 +209,7 @@ class ModelTemplate extends Model {
     "tables" -> "columns" :=add_columns
     "columns" -> "primary keys" :=add_pks
     "primary keys" -> "data" :=add_data
+    //"data" -> "change data type" :=change_dataType -> Need to fix exception.
     "data" -> "delete tables" :=drop_table
 
 }
