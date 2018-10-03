@@ -1,8 +1,12 @@
 # TestModelJDBC
 
-Uploaded Model with Transitions for create_table, add_columns, add_data.
+TODO: Add Modbat's Random_number generator, Add Methods for Fks, Joins.
 
-TODO: Add Modbat's Random_number generator, Add Methods for Pks, Fks, ChangeDataType, Joins.
+Added two new ways of generating test-data.
+
+Insert query changed from one to multiple Rows.
+
+Need to fix change_dataType method.
 
 Compile: scalac -cp openmodbat-3.2.jar ModelTemplate.scala
 
