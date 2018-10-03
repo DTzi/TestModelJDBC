@@ -146,7 +146,7 @@ class ModelTemplate extends Model {
 
                         for(f<-1 to x){//And here Insert for the rest of the Columns.
                           var random_string = A(Random.nextInt(A.size))//Get Random Strings from the List.
-                          //var random_string = s"first_name_${Random.alphanumeric take 10}" -> Get True random strings.
+                          //var random_string = s"name_${Random.alphanumeric take 10 mkString}" -> Get Random Strings from the List.
                           //var random_string = "string" + r.nextInt(100) Get Strings with enumeration.
                           st.setString(1 + f, random_string)//Random string for each column.
                         }
