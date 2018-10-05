@@ -12,6 +12,7 @@ class ModelTemplate extends Model {
     var con = DriverManager.getConnection("jdbc:postgresql://localhost:-/dbname","postgres", "User")
     var databaseMetaData = con.getMetaData();//Get Column_Names. Use it for pks,fks,datatype,joins.
     var stat = con.createStatement();
+    val r = scala.util.Random
 
     //Use the list to get random Strings. TODO Have lists for specific columns NAMES, CITIES, SALARY ETC.
     val A = List("String1", "String2", "String3",
@@ -209,7 +210,7 @@ class ModelTemplate extends Model {
     "tables" -> "columns" :=add_columns
     "columns" -> "primary keys" :=add_pks
     "primary keys" -> "data" :=add_data
-    //"data" -> "change data type" :=change_dataType -> Need to fix exception.
-    "data" -> "delete tables" :=drop_table
+    "data" -> "change data type" :=change_dataType throws ("org.postgresql.util.PSQLException")//The exception ALWAYS occurs
+    "data" -> "delete tables" :=drop_table//Need to delete for more than one tests.
 
 }
