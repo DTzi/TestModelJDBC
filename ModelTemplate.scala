@@ -211,6 +211,6 @@ class ModelTemplate extends Model {
     "columns" -> "primary keys" :=add_pks
     "primary keys" -> "data" :=add_data
     "data" -> "change data type" :=change_dataType throws ("org.postgresql.util.PSQLException")//The exception ALWAYS occurs
-    "data" -> "delete tables" :=drop_table//Need to delete for more than one tests.
+    "change data type" -> "delete tables" :=drop_table//Need to delete for more than one tests.
 
 }
