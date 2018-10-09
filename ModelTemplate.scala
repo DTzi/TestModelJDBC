@@ -205,6 +205,24 @@ class ModelTemplate extends Model {
 
                     }
               }
+    def joins{
+        //Cross Join
+        var Cross_Join = con.createStatement()
+        //Requires(n_table >= 2)
+        var rs = Cross_Join.executeQuery("SELECT * FROM table1 cross join table2")
+
+          while(rs.next()) {
+            var somedata = rs.getString("column1")
+            var someotherdata = rs.getString("column2")
+
+              System.out.print(", column1: " + somedata)
+              System.out.println(" ")
+              System.out.print(", column2: " + someotherdata)
+              System.out.println(" ")
+                }
+
+
+          }
               //TODO: Add transitions for PKS, FKS, ChangeDataType, Joins and other Queries.
     "Init" -> "tables" :=create_table
     "tables" -> "columns" :=add_columns
