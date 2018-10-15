@@ -23,13 +23,13 @@ class ModelTemplate extends Model {
     parameterName(choose(0, i))} */
     val random_tables = scala.util.Random
     //var a = random_columns.nextInt(6) + 5, use for certain limits
-    var a = random_columns.nextInt(9)//random number of Tables.
     //System.out.println(a)
     //var counter = 0
     var col = 0
     //var colArray = Vector[Int]()//Use the vector to remember the random_numbers to use them later.
     var pkcol = 0
-
+    var a = 0
+    
     def create_table{
 
         a = random_columns.nextInt(15) + 1
