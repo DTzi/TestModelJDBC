@@ -33,24 +33,23 @@ class ModelTemplate extends Model {
 
     def create_table{
 
-
-        table = "table"+x
+        a = random_columns.nextInt(15) + 1
+        table = "table" + a
         var createTable = con.createStatement ()
              createTable.executeUpdate ("CREATE TABLE " + table
                  + "(column0 INTEGER )")
-            
+
           }
 
 
    def add_columns{
 
-     for(x <- 1 to a){
 
-      col = random_columns.nextInt(9)
-      colArray = colArray :+ col
+      col = random_columns.nextInt(10) + 1
+      //colArray = colArray :+ col
       //System.out.println(col)
 
-      table = "table"+x
+      //table = "table"+x
 
          var s1 = "ALTER TABLE "
          var s2 = table
@@ -68,24 +67,17 @@ class ModelTemplate extends Model {
 
 
           }
-        }
+
       }
 
       def add_pks{
 
-        counter = 0//set an upper limit for tables, check it through the vector.
-        for(x<- colArray){
+        //counter = 0 set an upper limit for tables, check it through the vector.
 
-          //Have to use if-else statement, due to exception (Bound must be positive).
-          if (x != 0) {
-            pkcol = random_columns.nextInt(x)//assign random_number according to the number of columns.
-            }
-            else{
-              pkcol = 0
-            }
+            pkcol = random_columns.nextInt(col)
 
-            counter+=1
-            table = "table"+counter//tableName
+            //counter+=1
+            //table = "table"+counter//tableName
             var str_pk = "Alter table "
             var str_pk2 = table
             var str_pkc = str_pk.concat(str_pk2)// Query -> Alter table tableName
@@ -106,18 +98,16 @@ class ModelTemplate extends Model {
               System.out.println(PK.getString("COLUMN_NAME") + "===" + PK.getString("PK_NAME"))
             }*/
 
-      }
+
   }
 
     def add_data{
-      counter = 0//set an upper limit for tables, check it through the vector.
-
-        for(x <- colArray) {
+      //counter = 0 set an upper limit for tables, check it through the vector.
 
           var sample="( ?";//named prepared_statement for data.
-          counter+=1
+          //counter+=1
 
-            for(b<-1 to x){
+            for(b<-1 to col){
 
               sample+=", ?";
               }
@@ -126,7 +116,7 @@ class ModelTemplate extends Model {
               //System.out.println("stop")
 
               var str1 = "INSERT INTO "
-              table = "table"+counter
+              //table = "table"+counter
               var str2 = table
               var strr = str1.concat(str2)//get the String Query <INSERT INTO TABLE VALUES>
               //System.out.println(strr) DEBUG:
@@ -161,34 +151,25 @@ class ModelTemplate extends Model {
 
                       }
 
-                   }
+
 
                }
 
     def drop_table{
         //drop tables for multiple tests.
-        for(x <- 1 to a){
 
-          table = "table"+x
+          //table = "table"+x
           var dropTable = con.createStatement ()
           dropTable.executeUpdate ("DROP TABLE " + table)
-                        }
+
                     }
 
     def change_dataType{
 
-        counter = 0//set an upper limit for tables, check it through the vector.
+        //counter = 0 set an upper limit for tables, check it through the vector.
 
-          for(x <- colArray) {
-            if (x != 0) {
-            pkcol = random_columns.nextInt(x)//assign random_number according to the number of columns.
-                }
-            else{
-              pkcol = 0
-              }
-
-            counter+=1
-            table = "table"+counter
+            //counter+=1
+            //table = "table"+counter
             var string1 = "ALTER table "+table
             //System.out.println(string1)
             var string2 = " ALTER COLUMN " + "column" + pkcol
@@ -203,17 +184,30 @@ class ModelTemplate extends Model {
             stat.executeUpdate(final_)
 
                     }
-              }
+
+      /*"Init" -> "tables" :=create_table
+      "tables" -> "columns" :=add_columns
+      "columns" -> "primary keys" :=add_pks
+      "primary keys" -> "data" :=add_data
+      "data" -> "change data type" :=change_dataType throws ("org.postgresql.util.PSQLException")//The exception ALWAYS occurs
+      "change data type" -> "delete tables" :=drop_table//Need to delete for more than one tests.*/
+
+      //New Flexible transitions, one Operation per call.
+      "Init" -> "tables" :={create_table} weight 4
+      "tables" -> "columns" :=add_columns
+      "columns" -> "primary keys" :=add_pks
+      "primary keys" -> "data" :=add_data
+      "data" -> "call tables again" :=create_table
+      "call tables again" -> "call columns again" := add_columns
+      "call columns again" -> "call primary keys" :=add_pks
+      "call primary keys" -> "call data again" :=add_data
+      //"call data again" -> "call tables twice" :=create_table
+      //"call tables twice" -> "call columns twice" := add_columns
+      //"call columns twice" -> "call primary keys twice" :=add_pks
+      //"call primary keys twice" -> "call data again twice" :=add_data
 
 
 
-          }
-              //TODO: Add transitions for PKS, FKS, ChangeDataType, Joins and other Queries.
-    "Init" -> "tables" :=create_table
-    "tables" -> "columns" :=add_columns
-    "columns" -> "primary keys" :=add_pks
-    "primary keys" -> "data" :=add_data
-    "data" -> "change data type" :=change_dataType throws ("org.postgresql.util.PSQLException")//The exception ALWAYS occurs
-    "change data type" -> "delete tables" :=drop_table//Need to delete for more than one tests.
+
 
 }
