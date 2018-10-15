@@ -1,12 +1,10 @@
 # TestModelJDBC
 
-TODO: Add Modbat's Random_number generator, Add Methods for Fks, Joins.
+Transitions are now flexible. TODO: Add RemoveColumn.
 
-Added two new ways of generating test-data.
+TODO: Add Modbat's Random_number generator.
 
-Insert query changed from one to multiple Rows.
-
-Need to fix change_dataType method.
+Need to fix change_dataType Exception.
 
 Compile: scalac -cp openmodbat-3.2.jar ModelTemplate.scala
 
