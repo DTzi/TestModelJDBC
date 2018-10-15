@@ -21,7 +21,6 @@ class ModelTemplate extends Model {
     var table = ""//tablename
     val random_columns = scala.util.Random/* Random number of Columns, replace with modbat's built_in function  def chooseName(i: Int) = {
     parameterName(choose(0, i))} */
-    var a = 0
     val random_tables = scala.util.Random
     //var a = random_columns.nextInt(6) + 5, use for certain limits
     var a = random_columns.nextInt(9)//random number of Tables.
