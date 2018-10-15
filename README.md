@@ -1,6 +1,7 @@
 # TestModelJDBC
 
-Transitions are now flexible. TODO: Add RemoveColumn.
+Transitions are now flexible. TODO: Add the new functions in the transitions. Add Exception handling.
+Add Joins. 
 
 TODO: Add Modbat's Random_number generator.
 
