@@ -29,7 +29,7 @@ class ModelTemplate extends Model {
     //var colArray = Vector[Int]()//Use the vector to remember the random_numbers to use them later.
     var pkcol = 0
     var a = 0
-    
+
     def create_table{
 
         a = random_columns.nextInt(15) + 1
@@ -183,6 +183,17 @@ class ModelTemplate extends Model {
             stat.executeUpdate(final_)
 
                     }
+
+    def drop_column{
+
+            pkcol = random_columns.nextInt(col)
+            //System.out.println("DELETE COLUMN " + pkcol)
+
+              var dropCols = con.createStatement ()
+              dropCols.executeUpdate ("ALTER TABLE " + table + " DROP COLUMN " + "column" + pkcol)
+
+
+                  }
 
       /*"Init" -> "tables" :=create_table
       "tables" -> "columns" :=add_columns
