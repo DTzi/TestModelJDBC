@@ -21,25 +21,24 @@ class ModelTemplate extends Model {
     var table = ""//tablename
     val random_columns = scala.util.Random/* Random number of Columns, replace with modbat's built_in function  def chooseName(i: Int) = {
     parameterName(choose(0, i))} */
-
+    var a = 0
     val random_tables = scala.util.Random
     //var a = random_columns.nextInt(6) + 5, use for certain limits
     var a = random_columns.nextInt(9)//random number of Tables.
     //System.out.println(a)
-    var counter = 0
+    //var counter = 0
     var col = 0
-    var colArray = Vector[Int]()//Use the vector to remember the random_numbers to use them later.
+    //var colArray = Vector[Int]()//Use the vector to remember the random_numbers to use them later.
     var pkcol = 0
 
     def create_table{
 
-      for(x <- 1 to a){
 
         table = "table"+x
         var createTable = con.createStatement ()
              createTable.executeUpdate ("CREATE TABLE " + table
                  + "(column0 INTEGER )")
-            }
+            
           }
 
 
