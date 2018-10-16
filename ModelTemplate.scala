@@ -203,14 +203,13 @@ class ModelTemplate extends Model {
       "change data type" -> "delete tables" :=drop_table//Need to delete for more than one tests.*/
 
       //New Flexible transitions, one Operation per call.
-      "Init" -> "tables" :={create_table} weight 4
-      "tables" -> "columns" :=add_columns
-      "columns" -> "primary keys" :=add_pks
-      "primary keys" -> "data" :=add_data
-      "data" -> "call tables again" :=create_table
-      "call tables again" -> "call columns again" := add_columns
-      "call columns again" -> "call primary keys" :=add_pks
-      "call primary keys" -> "call data again" :=add_data
+      "Init" -> "create table" :={create_table} weight 4
+      "create table" -> "add columns" :=add_columns
+      "add columns" -> "add primary key" :=add_pks
+      "add primary key" -> "add data" :=add_data
+      "add data" -> "create another table" :=create_table
+      "create another table" -> "add columns to the new table" :=add_columns
+      "add columns to the new table" -> "remove one random column" :=drop_column
       //"call data again" -> "call tables twice" :=create_table
       //"call tables twice" -> "call columns twice" := add_columns
       //"call columns twice" -> "call primary keys twice" :=add_pks
