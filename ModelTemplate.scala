@@ -12,28 +12,28 @@ class ModelTemplate extends Model {
     var con = DriverManager.getConnection("jdbc:postgresql://localhost:-/dbname","postgres", "User")
     var databaseMetaData = con.getMetaData();//Get Column_Names. Use it for pks,fks,datatype,joins.
     var stat = con.createStatement();
-    val r = scala.util.Random
-
     //Use the list to get random Strings. TODO Have lists for specific columns NAMES, CITIES, SALARY ETC.
     val A = List("String1", "String2", "String3",
     "String4", "String5", "String6", "String7", "String8")
 
     var table = ""//tablename
-    val random_columns = scala.util.Random/* Random number of Columns, replace with modbat's built_in function  def chooseName(i: Int) = {
+    val random_columns = scala.util.Random/* Random number Generator, replace with modbat's built_in function  def chooseName(i: Int) = {
     parameterName(choose(0, i))} */
-    val random_tables = scala.util.Random
+    val random_tables = scala.util.Random// New RNG.
     //var a = random_columns.nextInt(6) + 5, use for certain limits
-    //System.out.println(a)
-    //var counter = 0
+    //var counter = 0 -> For multiple tables.
     var col = 0
     //var colArray = Vector[Int]()//Use the vector to remember the random_numbers to use them later.
     var pkcol = 0
     var a = 0
+    var colArray = Vector[Int]()//vector, remember the random_numbers to use them later in Joins.
+
 
     def create_table{
 
         a = random_columns.nextInt(15) + 1
         table = "table" + a
+        colArray = colArray :+ a//get table number to use in Joins.
         var createTable = con.createStatement ()
              createTable.executeUpdate ("CREATE TABLE " + table
                  + "(column0 INTEGER )")
@@ -45,25 +45,15 @@ class ModelTemplate extends Model {
 
 
       col = random_columns.nextInt(10) + 1
-      //colArray = colArray :+ col
       //System.out.println(col)
 
-      //table = "table"+x
-
-         var s1 = "ALTER TABLE "
-         var s2 = table
-         var st = s1.concat(s2)
-         var s3 = " add "
-         var st2 = st.concat(s3)
          var stz = con.createStatement()
 
          for(b <- 1 to col) {
 
-
-         var columnName = "Column" +b
-         var alter_table = st2 + columnName + " varchar(30)"
-         stz.executeUpdate(alter_table)
-
+           var columnName = "Column" +b
+           var alter_table = ("ALTER TABLE " + table + " add Column" + b + " varchar(30)" )
+           stz.executeUpdate(alter_table)
 
           }
 
@@ -75,16 +65,9 @@ class ModelTemplate extends Model {
 
             pkcol = random_columns.nextInt(col)
 
-            //counter+=1
             //table = "table"+counter//tableName
-            var str_pk = "Alter table "
-            var str_pk2 = table
-            var str_pkc = str_pk.concat(str_pk2)// Query -> Alter table tableName
-            //System.out.println(str_pkc)
-            var str_pk3 = " Add primary key"
-            var str_pkcc = str_pkc.concat(str_pk3)// Query -> Alter table tableName Add primary key
-            var str_pkcol = " (Column"+pkcol+")"//Get columnName
-            var complete_add_pks = str_pkcc.concat(str_pkcol)// Query -> Alter table tableName Add primary key ColumnName
+            var complete_add_pks = "Alter table " + table + " Add primary key (Column" + pkcol + ")"
+            //System.out.println("PRIMARY KEY ADDED")
 
             stat.executeUpdate(complete_add_pks)
 
@@ -101,10 +84,8 @@ class ModelTemplate extends Model {
   }
 
     def add_data{
-      //counter = 0 set an upper limit for tables, check it through the vector.
 
           var sample="( ?";//named prepared_statement for data.
-          //counter+=1
 
             for(b<-1 to col){
 
@@ -113,25 +94,18 @@ class ModelTemplate extends Model {
               sample+=" )";//get the amount of data to be inserted.
               //System.out.println(sample)
               //System.out.println("stop")
+              var query = "INSERT INTO " + table + " VALUES " + sample
 
-              var str1 = "INSERT INTO "
-              //table = "table"+counter
-              var str2 = table
-              var strr = str1.concat(str2)//get the String Query <INSERT INTO TABLE VALUES>
-              //System.out.println(strr) DEBUG:
-              var query = strr +
-                       " VALUES " + sample
+                //System.out.println(query) DEBUG:
+                //  var st = con.prepareStatement("INSERT INTO table16 VALUES (?)");
+                var st = con.prepareStatement(query)
+                // var p=con.prepareStatement(st);
+                var d = 0
+                var count = 0
 
-                      //  System.out.println(query) DEBUG:
-                      //  var st = con.prepareStatement("INSERT INTO table16 VALUES (?)");
-                      var st = con.prepareStatement(query)
-                      // var p=con.prepareStatement(st);
-                      var d = 0
-                      var count = 0
+                  for(d<-1 to 5){//Number of Rows. Could be random.
 
-                      for(d<-1 to 5){//Number of Rows. Could be random.
-
-                        st.setInt(1,d)//First Column.
+                      st.setInt(1,d)//First Column.
 
                         for(f<-1 to x){//And here Insert for the rest of the Columns.
                           var random_string = A(Random.nextInt(A.size))//Get Random Strings from the List.
@@ -164,7 +138,7 @@ class ModelTemplate extends Model {
                     }
 
     def change_dataType{
-
+        //Need to clean up.
         //counter = 0 set an upper limit for tables, check it through the vector.
 
             //counter+=1
@@ -195,6 +169,34 @@ class ModelTemplate extends Model {
 
                   }
 
+
+    def joins{
+        //Inner Join
+        var Inner_join = con.createStatement()
+        //Requires(n_table >= 2)
+        //val rnd = new Random
+        //var z =  rnd.nextInt(colArray.size)
+        var random_joins = colArray(Random.nextInt(colArray.size))
+        //System.out.println("first random table " + random_joins)
+        colArray = colArray.filterNot(_ == random_joins)
+        //var new_random_joins = colArray.filter(_ != random_joins)
+        var second_joins = colArray(Random.nextInt(colArray.size))
+        //System.out.println("second random table " + second_joins)
+
+        //System.out.println("SELECT table" + random_joins + ".column1, table" + random_joins + " AS COL1 FROM table" + random_joins + " INNER JOIN table" + second_joins +" ON table" +random_joins + ".column0= table" + second_joins + ".column0")
+        var rs = Inner_join.executeQuery("SELECT table" + random_joins + ".column1, table" + second_joins + ".column1 AS COL1 FROM table" + random_joins + " INNER JOIN table" + second_joins +" ON table" +random_joins + ".column0= table" + second_joins + ".column0")
+
+                System.out.println("Col, Data:");
+                    while (rs.next()) {
+                        var column1 = rs.getString("Column1");
+                        var column2 = rs.getString("COL1");
+
+                            System.out.println("    " + column1 + ", " + column2);
+
+                          }
+
+            }
+
       /*"Init" -> "tables" :=create_table
       "tables" -> "columns" :=add_columns
       "columns" -> "primary keys" :=add_pks
@@ -202,14 +204,16 @@ class ModelTemplate extends Model {
       "data" -> "change data type" :=change_dataType throws ("org.postgresql.util.PSQLException")//The exception ALWAYS occurs
       "change data type" -> "delete tables" :=drop_table//Need to delete for more than one tests.*/
 
-      //New Flexible transitions, one Operation per call.
-      "Init" -> "create table" :={create_table} weight 4
+      //New Flexible transitions, one Operation per call. Need to Rename transitions.
+      "Init" -> "create table" :=create_table
       "create table" -> "add columns" :=add_columns
       "add columns" -> "add primary key" :=add_pks
       "add primary key" -> "add data" :=add_data
-      "add data" -> "create another table" :=create_table
-      "create another table" -> "add columns to the new table" :=add_columns
-      "add columns to the new table" -> "remove one random column" :=drop_column
+      "add data" -> "create new table" :=create_table
+      "create new table" -> "add columns to the new table" :=add_columns
+      //"add columns to the new table" -> "remove one random column" :=drop_column
+      "add columns to the new table" -> "add data to the new table" :=add_data
+      "add data to the new table" -> "add joins" :=joins
       //"call data again" -> "call tables twice" :=create_table
       //"call tables twice" -> "call columns twice" := add_columns
       //"call columns twice" -> "call primary keys twice" :=add_pks
