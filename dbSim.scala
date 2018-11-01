@@ -4,10 +4,10 @@
   //==========================================================================================
   //Init tables if they do not exist, with first column, exactly like JDBC model (createTable).
   //Populate tables with any datatype.
+  //Detele Tables.
+  //TODO ->
   //Add Primary Key.
-  //Add Delete table.
   //Add columns, delete columns.
-  //More queries.
 
   object dbSim{
     var myarray = Array.ofDim[Any](5,4,2)//set of 5 arrays with 4 rows, 2 cols.
