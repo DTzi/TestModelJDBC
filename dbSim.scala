@@ -52,13 +52,12 @@ object dbSim{
           myarray(k)(j)(i) = 0
         }    
       }
-
     }
   }
 
   def deleteTable(st: Array[Array[Array[Any]]], a:Int){
-    trackPk = trackPk.filterNot(_ == trackPk.last)
     if (trackTables.contains(a)) {
+      trackPk = trackPk.filterNot(_ == trackPk.last)
       //table exists, delete it.
       println("table exists, deleting")
       trackTables = trackTables.filterNot(_ == a)
@@ -93,6 +92,7 @@ object dbSim{
   }
 
   def addData(st: Array[Array[Array[Any]]], a:Int){
+    //Just check if we can insert into the table created 
     //countTables += 1
     for(k <- a to a){ 
       for(i <- 1 to 1){
@@ -121,14 +121,10 @@ object dbSim{
             mySet += myarray(k)(j)(i)
         }    
       }
-
     }
-
   }
 
   def main(args: Array[String]){
-    //first initialise the chosen table, populate the first column like JDBC Model create_table.
-    //populate the table, then add Primary Key.
 
     //create table, and print it.
     initTable(myarray, table2)//table1 -> a = random_columns.nextInt
