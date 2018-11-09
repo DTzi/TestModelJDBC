@@ -2,155 +2,125 @@ import Array._
 import scala.util.Random
 import scala.collection.mutable.HashSet
 
-//Start simple and simulate the dabatase.
-//==========================================================================================
-//Create tables if they do not exist, with first column, exactly like JDBC model (createTable).
-//Populate tables with any datatype
-//Detele Tables
-//Check PK uniqueness - Insert PK.
-//Detele Col
-//TODO ->
-//Add columns
-//Add Joins
-//Change Data Type
 
-object dbSim{
+class dbSim{
+  var myarray = Array.ofDim[Any](5,4)
   val A = List("String1", "String2", "String3",
     "String4")
-  var myarray = Array.ofDim[Any](5,4,2)//set of 5 arrays with 4 rows, 2 cols.
   var trackTables = Vector[Int]()//tracks tables that already created.
-  var Cols = Vector[Int]()//tracks columns.
-  var trackPk = Vector[Int]()//tracks pk.
-  var countTables = 0//counts the number of tables created.
-  //My DB tables for arguments just for this program. Choose table according to RNG of table Name.
-  var table1 = 0
-  var table2 = 1
-  var table3 = 2
-  var table4 = 3
-  var table5 = 4
-  var init = 0//Initialise the first col.
+  var trackPk = Vector[Int]()//tracks Primary Keys.
 
-  def printArray(st: Array[Array[Array[Any]]], a:Int){
-    for(j <- 0 to 3){
-      for(k <- 0 to 1){
-        println(myarray(a)(j)(k))
+  def printArray(){
+    for(i <- 0 to myarray.length-1){
+      for(j <- 0 to myarray(0).length-1){
+        println(myarray(i)(j))
       }
       println()
     }
-    //println("number of tables created :" + countTables)
   }
 
-  def addCol(a:Int){
-    //Add number of Columns.
+  def deleteCol(a:Int){
+    for(i <- 0 to myarray.length-1){
+      //Just delete everything in the given Column.
+      myarray(i)(a) = 0
+    } 
   }
 
-  def deleteCol(st: Array[Array[Array[Any]]], a:Int, b:Int){
-    for(k <- a to a){ 
-      for(i <- b to b){
-        for(j <- 0 to myarray(1).length-1){
-          //Just delete everything in the given Column.
-          myarray(k)(j)(i) = 0
-        }    
+  def deleteTable(){
+    //Remove primary key.
+    trackPk = trackPk.filterNot(_ == trackPk.last)
+    //And delete everything in the table.
+    for(i <- 0 to myarray.length-1){
+      for(j <- 0 to myarray(0).length-1){
+        myarray(i)(j) = 0
       }
     }
   }
 
-  def deleteTable(st: Array[Array[Array[Any]]], a:Int){
-    if (trackTables.contains(a)) {
-      trackPk = trackPk.filterNot(_ == trackPk.last)
-      //table exists, delete it.
-      println("table exists, deleting")
-      trackTables = trackTables.filterNot(_ == a)
-      for(j <- 0 to 3){
-        for(k <- 0 to 1){
-          myarray(a)(j)(k) = 0
-        }
-      }
-    }
-    else{
-      println("table doesnt't exist")
-    }
-  }
-
-  def initTable(st: Array[Array[Array[Any]]], a:Int){
+  def initTable(a:Int){
     //First check if table already exists.
     if (trackTables.contains(a)) {
       println("Table already exists")
     }
     //If not, initialise it.
     else{
-      countTables += 1
-      init = 0
-      for(j <- 0 to 3){
+      trackTables = trackTables :+ a
+      var init = 0
+      for(i <- 0 to myarray.length-1){
         init += 1
-        for(k <- 0 to 0){
-          myarray(a)(j)(k) = init
-        }
+        myarray(i)(0) = init
       }
       println("table created!")
     }
   }
 
-  def addData(st: Array[Array[Array[Any]]], a:Int){
-    //Just check if we can insert into the table created 
-    //countTables += 1
-    for(k <- a to a){ 
-      for(i <- 1 to 1){
-        for(j <- 0 to myarray(1).length-1){
-        //var rng = "get random element from RNG. "
+  def addData(a:Int){
+    for(i <- 0 to myarray.length-1){
+      for(j <- 1 to a){
         var random_string = A(Random.nextInt(A.size))
-        //println(random_string)
-        myarray(k)(j)(i) = random_string
-       }
+        myarray(i)(j) = random_string
       }
+    }
+    var pkcheck = trackPk.last
+    println(pkcheck)
+    addPkUtil(pkcheck)//call the helper function to check if duplicates exist.
+  }
+
+  def addPk(a:Int){
+    if(trackPk.contains(a)){
+      println("table has already a PK")
+    }
+    else{
+      trackPk = trackPk :+ a
+      //addPkUtil(a,b)
+      println("PK added")
     }
   }
 
-  //helper function for PK uniqueness.    
-  def addDataUtil(st: Array[Array[Array[Any]]], a:Int, b:Int){
-    //Check for Duplicate Data only in the PK Col.
-    for(k <- a to a){ 
-      //for(i <- 0 to myarray(0)(1).length-1){
-      for(i <- b to b){
-        val mySet = HashSet.empty[Any]
-        for(j <- 0 to myarray(1).length-1){
-          //Check for duplicates in the set of Column Data.
-          println("check for Pk")
-          println(myarray(k)(j)(i))
-          if (mySet.contains(myarray(k)(j)(i))) println("duplicate")
-            mySet += myarray(k)(j)(i)
-        }    
-      }
+  //helper function to find pk-duplicates.
+  def addPkUtil(a:Int){
+    val mySet = HashSet.empty[Any]
+    for(i <- 0 to myarray.length-1){
+      println(myarray(i)(a))
+      if(mySet.contains(myarray(i)(a))) println("duplicate")  
+        mySet += myarray(i)(a)
     }
   }
 
+  //Function to test number of Columns in the JDBC model.
+  def addCols(a:Int){
+    //Initialise the table but the first Column.
+    for(i <- 0 to myarray.length-1){
+      for(j <- 1 to a){
+        myarray(i)(j) = 0
+      }
+    }
+  } 
+}
+
+object dbSim{
   def main(args: Array[String]){
+    //Create an array of objects.
+    var mylist:Array[dbSim]= new Array[dbSim](10)
 
-    //create table, and print it.
-    initTable(myarray, table2)//table1 -> a = random_columns.nextInt
-    trackTables = trackTables :+ table2
-    //addCol()
-    trackPk = trackPk :+ table2
-    //println("Printing Initialised Table")
-    printArray(myarray, table2)
-    //println("Added data")
-    addData(myarray, table2) 
-    printArray(myarray, table2)
+    for(i <- 0 to mylist.length-1){
+      mylist(i) = new dbSim()
+    }
 
-    deleteCol(myarray, table2, 1)
-    printArray(myarray, table2)
+    //get params through JDBC MODEL.
+    //Operations following JDBC model's transitions.
 
-    deleteTable(myarray, table2)
-    //println("Printing Empty table and Removed PK")
-    printArray(myarray, table2)
-
-    initTable(myarray, table2)
-    trackTables = trackTables :+ table2
-    trackPk = trackPk :+ table2
-    addData(myarray, table2) 
-    println("")
-    addDataUtil(myarray, table2, trackPk.last)
-    printArray(myarray, table2)
+    //Create table.
+    mylist(0).initTable(0)
+    //add 2 empty columns.
+    mylist(0).addCols(2)
+    //add pk to the table.
+    mylist(0).addPk(1)
+    //add some data and check if there are any duplicates in the Primary Key Column.  
+    mylist(0).addData(2)
+    //delete the third Column and print the table.
+    mylist(0).deleteCol(2)
+    mylist(0).printArray()
 
   }
 }
