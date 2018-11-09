@@ -7,7 +7,7 @@ class dbSim{
   var myarray = Array.ofDim[Any](5,4)
   val A = List("String1", "String2", "String3",
     "String4")
-  var trackTables = Vector[Int]()//tracks tables that already created.
+  var trackTables = false//tracks tables that already created.
   var trackPk = Vector[Int]()//tracks Primary Keys.
 
   def printArray(){
@@ -37,14 +37,14 @@ class dbSim{
     }
   }
 
-  def initTable(a:Int){
+  def initTable(){
     //First check if table already exists.
-    if (trackTables.contains(a)) {
+    if (trackTables == true) {
       println("Table already exists")
     }
     //If not, initialise it.
     else{
-      trackTables = trackTables :+ a
+      trackTables = true
       var init = 0
       for(i <- 0 to myarray.length-1){
         init += 1
@@ -62,7 +62,6 @@ class dbSim{
       }
     }
     var pkcheck = trackPk.last
-    println(pkcheck)
     addPkUtil(pkcheck)//call the helper function to check if duplicates exist.
   }
 
@@ -111,7 +110,8 @@ object dbSim{
     //Operations following JDBC model's transitions.
 
     //Create table.
-    mylist(0).initTable(0)
+    mylist(0).initTable()
+    mylist(0).initTable()
     //add 2 empty columns.
     mylist(0).addCols(2)
     //add pk to the table.
