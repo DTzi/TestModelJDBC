@@ -3,12 +3,10 @@ import scala.util.Random;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import scala.collection.mutable.ListBuffer;
 
 import modbat.dsl._
 
 class ModelTemplate extends Model{
-
      Class.forName("org.postgresql.Driver")
      var con = DriverManager.getConnection("jdbc:postgresql://localhost:/dbname","postgres", "admin")
      var databaseMetaData = con.getMetaData()//get the information needed for the test functions.
@@ -16,33 +14,32 @@ class ModelTemplate extends Model{
      val A = List("String1", "String2", "String3",
           "String4", "String5", "String6", "String7", "String8")
      var table = ""//tablename
-     val myRng = scala.util.Random
      var a = 0
      var col = 0
      var colArray = Vector[Int]()//remember the random numbers to use them later.
      var pkcol = 0
+     val colparam = choose(1, 9)//Number of Cols. Need to make it local.
 
-     def create_table{
-          a = myRng.nextInt(15) + 1
+     def create_table (a:Int){
           table = "table" + a
+          println(table)
           colArray = colArray :+ a//get table number to use in Joins.
           var createTable = con.createStatement()
           createTable.executeUpdate ("CREATE TABLE " + table
                + "(column0 INTEGER )")
      }
 
-     def add_columns{
-          col = myRng.nextInt(10) + 1
+     def add_columns(a:Int){
           var stz = con.createStatement()
-          for(b <- 1 to col) {
+          for(b <- 1 to a) {
                var alter_table = ("ALTER TABLE " + table + " add Column" + b + " varchar(30)" )
                stz.executeUpdate(alter_table)
           }
      }
 
-     def add_pks{
-          pkcol = myRng.nextInt(col)
-          var complete_add_pks = "Alter table " + table + " Add primary key (Column" + pkcol + ")"
+     def add_pks(a:Int){
+          //pkcol = myRng.nextInt(col)
+          var complete_add_pks = "Alter table " + table + " Add primary key (Column" + a + ")"
           stat.executeUpdate(complete_add_pks)
      }
 
@@ -76,7 +73,7 @@ class ModelTemplate extends Model{
      def change_dataType{
           for(x <- colArray) {
                if (x != 0) {
-                    pkcol = myRng.nextInt(x)//assign random_number according to the number of columns.
+                    val pkcol = choose(0, x)//assign random_number according to the number of columns.
                }
                else{
                     pkcol = 0
@@ -116,8 +113,9 @@ class ModelTemplate extends Model{
      }
 
      def drop_column{
-          pkcol = myRng.nextInt(col)
-          System.out.println("DELETE COLUMN " + pkcol)
+          //pkcol = myRng.nextInt(col)
+          val pkcol = choose(1, colparam)
+          //System.out.println("DELETE COLUMN " + pkcol)
           var dropCols = con.createStatement ()
           dropCols.executeUpdate ("ALTER TABLE " + table + " DROP COLUMN " + "column" + pkcol)
      }
@@ -154,12 +152,28 @@ class ModelTemplate extends Model{
      }
 
 
-     "Init" -> "create table" :=create_table
-     "create table" -> "add cols" := add_columns
-     "add cols" -> "add primary key" := add_pks
-     "add primary key" -> "test primary key" := test_pk//test Primary key
-     "test primary key" -> "check if table exists" :=test_table//detect if table exists and table Name.
-     "check if table exists" -> "get number of columns" := test_cols//get the number of columns.
+     "Init" -> "create table" :={ 
+          val param = choose(1,5)
+          val createtableModel = create_table(param)
+          //val createtabledbSim
+     }
+     "create table" -> "add some columns" :={ 
+          val addcolsModel = add_columns(colparam)
+          //val addcolsdbSim
+     }
+
+     "add some columns" -> "add primary key" :={
+          val pkparam = choose(1, colparam)
+          val addpkModel = add_pks(pkparam)
+          //val addpkdbSim
+
+     }
+
+     //"create table" -> "add cols" := add_columns
+     //"add cols" -> "add primary key" := add_pks
+     //"add primary key" -> "test primary key" := test_pk//test Primary key
+     //"test primary key" -> "check if table exists" :=test_table//detect if table exists and table Name.
+     //"check if table exists" -> "get number of columns" := test_cols//get the number of columns.
 
      //"create table" -> "add primary key" := add_pks
      //"add primary key" -> "test exception pk" := add_pks
