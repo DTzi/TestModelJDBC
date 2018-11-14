@@ -1,8 +1,8 @@
 package modbat
-import scala.util.Random;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
+import scala.util.Random
+import java.sql.Connection
+import java.sql.DriverManager
+import java.sql.PreparedStatement
 
 import modbat.dsl._
 
@@ -19,6 +19,11 @@ class ModelTemplate extends Model{
      var colArray = Vector[Int]()//remember the random numbers to use them later.
      var pkcol = 0
      val colparam = choose(1, 9)//Number of Cols. Need to make it local.
+     var mylist:Array[dbSim]= new Array[dbSim](10)
+     for(i <- 0 to mylist.length-1){
+      mylist(i) = new dbSim()
+    }
+
 
      def create_table (a:Int){
           table = "table" + a
@@ -155,7 +160,8 @@ class ModelTemplate extends Model{
      "Init" -> "create table" :={ 
           val param = choose(1,5)
           val createtableModel = create_table(param)
-          //val createtabledbSim
+          val createtabledbSim = mylist(param).createTable()
+          val throwserror = mylist(param).createTable()//calling createTable() again throws error.
      }
      "create table" -> "add some columns" :={ 
           val addcolsModel = add_columns(colparam)
