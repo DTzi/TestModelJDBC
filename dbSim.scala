@@ -1,3 +1,4 @@
+package modbat
 import Array._
 import scala.util.Random
 import scala.collection.mutable.HashSet
@@ -26,6 +27,12 @@ class dbSim{
       }
       //println("table created!")
     }
+  }
+
+  def returntable() :Boolean = {
+     //test Function.
+     return trackTables
+
   }
 
   //Function to test number of Columns in the JDBC model.
