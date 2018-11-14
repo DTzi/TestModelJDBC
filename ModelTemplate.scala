@@ -23,6 +23,8 @@ class ModelTemplate extends Model{
      for(i <- 0 to mylist.length-1){
       mylist(i) = new dbSim()
     }
+     val tableparam = choose(1,5)//Make it local?
+
 
 
      def create_table (a:Int){
@@ -158,20 +160,19 @@ class ModelTemplate extends Model{
 
 
      "Init" -> "create table" :={ 
-          val param = choose(1,5)
-          val createtableModel = create_table(param)
-          val createtabledbSim = mylist(param).createTable()
-          val throwserror = mylist(param).createTable()//calling createTable() again throws error.
+          val createtableModel = create_table(tableparam)
+          val createtabledbSim = mylist(tableparam).createTable()
+          val throwserror = mylist(tableparam).createTable()//calling createTable() again throws error.
      }
      "create table" -> "add some columns" :={ 
           val addcolsModel = add_columns(colparam)
-          //val addcolsdbSim
+          val addcolsdbSim = mylist(tableparam).addCols(colparam)
      }
 
      "add some columns" -> "add primary key" :={
           val pkparam = choose(1, colparam)
           val addpkModel = add_pks(pkparam)
-          //val addpkdbSim
+          val addpkdbSim = mylist(tableparam).addPk(pkparam)
 
      }
 
