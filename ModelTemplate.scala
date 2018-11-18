@@ -14,22 +14,21 @@ class ModelTemplate extends Model{
      var stat = con.createStatement()
      val A = List("String1", "String2", "String3",
           "String4", "String5", "String6", "String7", "String8")
-     var a = 0
      var col = 0
      var colArray = Vector[Int]()//remember the random numbers to use them later.
      var pkcol = 0
-     val colparam = choose(1, 9)//Number of Cols. Need to make it local.
+     val colparam = choose(1, 9)//Number of Cols. Need to make it local?
      var mylist:Array[dbSim]= new Array[dbSim](10)
      for(i <- 0 to mylist.length-1){
       mylist(i) = new dbSim()
     }
      val tableparam = choose(1, 10)//Make it local?
-     var table = ""//need this to be visible and being used by every function. Table actually is a local parameter passed by create_table
+     var table = ""
 
 
      def create_table(a:Int){
           table = "table" + a
-          colArray = colArray :+ a//get table number to use in Joins.
+          colArray = colArray :+ a//get table number.
           var createTable = con.createStatement()
           createTable.executeUpdate ("CREATE TABLE " + table
                + "(column0 INTEGER )")
@@ -131,7 +130,7 @@ class ModelTemplate extends Model{
           table = "table" + a//Need to re-initialise? avoid always true error.
           var rs = databaseMetaData.getTables(null, null, table, null)
           if (rs.next()) {
-               return true
+                return true
                //throw org.postgresql.util.PSQLException: ERROR: relation "table" already exists.
           }
           else {
@@ -140,25 +139,32 @@ class ModelTemplate extends Model{
      }
 
      //test number of columns.
-     def test_cols{
+     def test_cols() :Int ={
           var ps = con.prepareStatement("SELECT * FROM " + table)
           var rs = ps.executeQuery()
           var getcols = rs.getMetaData()
-          var colsnumber = getcols.getColumnCount()
-          //return colsnumber
-          println("number of columns :" + getcols.getColumnCount())
+          return getcols.getColumnCount()
      }
 
      //test Primary key.
-     def test_pk(){
+     def test_pk() :Boolean ={
            //Verify pks are correctly assigned to the table.
           var PK = databaseMetaData.getPrimaryKeys(null, null, table)
-          if (PK.next())
-          {
-          //return true
-          System.out.println(PK.getString("COLUMN_NAME") + "=" + PK.getString("PK_NAME"))
-        }
+          if (PK.next()) {
+                return true
+          }
+          else {
+               return false
+          }
      }
+
+     //Model Transition
+     /*a" -> "b" := {
+          val params = chooseParameter(s)
+          val systemResult = database.action(params)
+          val modelResult = dbSim.action(params)
+          checkResult(systemResult, modelResult)
+    }*/
 
      "Init" -> "create table" :={
           val createtableModel = create_table(tableparam)
@@ -167,17 +173,22 @@ class ModelTemplate extends Model{
           assert(test_table(tableparam) == mylist(tableparam).returntable())
      }
      "create table" -> "add some columns" :={
-          val addcolsModel = add_columns(colparam)
-          val addcolsdbSim = mylist(tableparam).addCols(colparam)
+          add_columns(colparam)
+          mylist(tableparam).addCols(colparam)
      }
      "add some columns" -> "test columns" := {
           val testColsModel = test_cols
-          //val testColsdbSim =
+          val testColsdbSim = mylist(tableparam).returnCols()
+          assert(testColsModel == testColsdbSim)
      }
      "test columns" -> "add primary key" :={
           val pkparam = choose(1, colparam)
           val addpkModel = add_pks(pkparam)
           val addpkdbSim = mylist(tableparam).addPk(pkparam)
+          //assert PKS.
+     }
+     "add primary key" -> "test PK" :={
+          assert(test_pk() == mylist(tableparam).returnPK())
      }
 
      //"add cols" -> "add primary key" := add_pks
