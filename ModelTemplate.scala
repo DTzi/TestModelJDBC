@@ -14,15 +14,16 @@ class ModelTemplate extends Model{
      var stat = con.createStatement()
      val A = List("String1", "String2", "String3",
           "String4", "String5", "String6", "String7", "String8")
+     //create a list with random data to pass into add_data, in model and dbSim.
      var col = 0
      var colArray = Vector[Int]()//remember the random numbers to use them later.
      var pkcol = 0
-     val colparam = choose(1, 9)//Number of Cols. Need to make it local?
+     val colparam = choose(1, 9)//Number of Cols.
      var mylist:Array[dbSim]= new Array[dbSim](10)
      for(i <- 0 to mylist.length-1){
       mylist(i) = new dbSim()
     }
-     val tableparam = choose(1, 10)//Make it local?
+     val tableparam = choose(1, 10)//Table Parameter
      var table = ""
 
 
@@ -50,7 +51,7 @@ class ModelTemplate extends Model{
      def add_data{
           //if there are duplicates in PK col, throw org.postgresql.util.PSQLException: ERROR: multiple primary keys for table "table" are not allowed.
           var sample="( ?"//named prepared_statement for data.
-          for(b<-1 to col){
+          for(b<-1 to colparam){
                sample+=", ?"
           }
           sample+=" )"//get the amount of data to be inserted.
@@ -60,7 +61,7 @@ class ModelTemplate extends Model{
           var count = 0
           for(d <- 1 to 2){//Number of Rows.
                st.setInt(1,d)//First Column.
-               for(f<-1 to col){
+               for(f<-1 to colparam){
                     var random_string = A(Random.nextInt(A.size))//Get Random Strings from the List.
                     println(random_string)
                     st.setString(1 + f, random_string)//Random string for each column.
@@ -92,12 +93,6 @@ class ModelTemplate extends Model{
           }
      }
 
-     def drop_table{
-          //drop tables for multiple tests.
-          var dropTable = con.createStatement()
-          dropTable.executeUpdate ("DROP TABLE " + table)
-     }
-
      def joins{
           //Inner Join
           var Inner_join = con.createStatement()
@@ -126,7 +121,7 @@ class ModelTemplate extends Model{
 
      //checkResult test functions
      //test if table exists.
-     def test_table(a:Int) :Boolean ={
+     def table_exists(a:Int) :Boolean ={
           table = "table" + a//Need to re-initialise? avoid always true error.
           var rs = databaseMetaData.getTables(null, null, table, null)
           if (rs.next()) {
@@ -139,7 +134,7 @@ class ModelTemplate extends Model{
      }
 
      //test number of columns.
-     def test_cols() :Int ={
+     def number_of_cols() :Int ={
           var ps = con.prepareStatement("SELECT * FROM " + table)
           var rs = ps.executeQuery()
           var getcols = rs.getMetaData()
@@ -147,7 +142,7 @@ class ModelTemplate extends Model{
      }
 
      //test Primary key.
-     def test_pk() :Boolean ={
+     def pk_exists() :Boolean ={
            //Verify pks are correctly assigned to the table.
           var PK = databaseMetaData.getPrimaryKeys(null, null, table)
           if (PK.next()) {
@@ -158,6 +153,16 @@ class ModelTemplate extends Model{
           }
      }
 
+     //Drop everything before the transitions.
+     @Before
+     def dropTables{
+       for(i <- 0 to 9){
+         table = "table" + i
+         var dropTable = con.createStatement()
+         dropTable.executeUpdate ("DROP TABLE IF EXISTS " + table)
+       }
+     }
+
      //Model Transition
      /*a" -> "b" := {
           val params = chooseParameter(s)
@@ -166,18 +171,20 @@ class ModelTemplate extends Model{
           checkResult(systemResult, modelResult)
     }*/
 
+     //"Drop everything before Init" -> "Init" := dropTables
+
      "Init" -> "create table" :={
           val createtableModel = create_table(tableparam)
           val createtabledbSim = mylist(tableparam).createTable()
           //val throwserror = mylist(tableparam).createTable()//calling createTable() again throws error.
-          assert(test_table(tableparam) == mylist(tableparam).returntable())
+          assert(table_exists(tableparam) == mylist(tableparam).returntable())
      }
      "create table" -> "add some columns" :={
           add_columns(colparam)
           mylist(tableparam).addCols(colparam)
      }
      "add some columns" -> "test columns" := {
-          val testColsModel = test_cols
+          val testColsModel = number_of_cols
           val testColsdbSim = mylist(tableparam).returnCols()
           assert(testColsModel == testColsdbSim)
      }
@@ -188,8 +195,13 @@ class ModelTemplate extends Model{
           //assert PKS.
      }
      "add primary key" -> "test PK" :={
-          assert(test_pk() == mylist(tableparam).returnPK())
+          assert(pk_exists() == mylist(tableparam).returnPK())
      }
+
+     //Example Exception
+     //Postgres exception org.postgresql.util.PSQLException: ERROR: duplicate key value violates unique constraint "table9_pkey"
+     //Detail: Key (column2)=(String2) already exists. at add_data:
+     "test PK" -> "add data" := add_data
 
      //"add cols" -> "add primary key" := add_pks
      //"add primary key" -> "test primary key" := test_pk//test Primary key
