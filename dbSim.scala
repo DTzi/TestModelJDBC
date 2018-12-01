@@ -8,18 +8,18 @@ class dbSim{
   var myarray = Array.ofDim[Any](5,10)
   val A = List("String1", "String2", "String3",
     "String4")//Using a small list for debugging.
-  var trackTables = false//tracks tables that already created.
+  var initialized = false//checks if table has already initialized.
   var trackPk = Vector[Int]()//tracks Primary Keys.
 
   def createTable(){
     //First check if table already exists.
-    if (trackTables == true) {
+    if (initialized == true) {
       //throw org.postgresql.util.PSQLException: ERROR: relation "table" already exists
       println("Table already exists")
     }
     //If not, initialise it.
     else{
-      trackTables = true
+      initialized = true
       var init = 0
       for(i <- 0 to myarray.length-1){
         init += 1
@@ -31,7 +31,7 @@ class dbSim{
 
   def returntable() :Boolean ={
      //test Function.
-     return trackTables
+     return initialized
   }
 
   //Function to test number of Columns in the JDBC model.
