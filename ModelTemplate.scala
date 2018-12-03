@@ -60,7 +60,7 @@ class ModelTemplate extends Model{
           //println(query)
           var st = con.prepareStatement(query)
           var count = 0
-          var datacounter = 0//Counts up to colparam * 2, which is the size of the vector. Col param * 2 is the size of the table.
+          var datacounter = 0//Counts up to colparam * 2, which represents the columns * 2 rows.
           for(d <- 1 to 2){//Number of Rows.
                st.setInt(1,d)//First Column.
                for(f <- 1 to colparam){
@@ -165,7 +165,6 @@ class ModelTemplate extends Model{
          //and add it in the list.
          randData = randData :+ random_string
        }
-       //println(randData) Prints the enitre vector, Debugging.
      }
 
      //Drop everything before the transitions.
@@ -216,8 +215,10 @@ class ModelTemplate extends Model{
      //Example Exception
      //Postgres exception org.postgresql.util.PSQLException: ERROR: duplicate key value violates unique constraint "table9_pkey"
      //Detail: Key (column2)=(String2) already exists. at add_data:
-     "test PK" -> "add data" := add_data(randData)
-
+     "test PK" -> "add data" :={
+       add_data(randData)
+       mylist(tableparam).addData(colparam, randData)
+     }
      //"add cols" -> "add primary key" := add_pks
      //"add primary key" -> "test primary key" := test_pk//test Primary key
      //"test primary key" -> "check if table exists" :=test_table//detect if table exists and table Name.
