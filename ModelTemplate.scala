@@ -17,6 +17,7 @@ class ModelTemplate extends Model{
      //create a list with random data to pass into add_data, in model and dbSim.
      var col = 0
      var colArray = Vector[Int]()//remember the random numbers to use them later.
+     var randData = Vector[String]()//list of Random Strings.
      var pkcol = 0
      val colparam = choose(1, 9)//Number of Cols.
      var mylist:Array[dbSim]= new Array[dbSim](10)
@@ -48,7 +49,7 @@ class ModelTemplate extends Model{
           stat.executeUpdate(complete_add_pks)
      }
 
-     def add_data{
+     def add_data(data:Vector[String]){
           //if there are duplicates in PK col, throw org.postgresql.util.PSQLException: ERROR: multiple primary keys for table "table" are not allowed.
           var sample="( ?"//named prepared_statement for data.
           for(b<-1 to colparam){
@@ -59,12 +60,14 @@ class ModelTemplate extends Model{
           //println(query)
           var st = con.prepareStatement(query)
           var count = 0
+          var datacounter = 0//Counts up to colparam * 2, which is the size of the vector. Col param * 2 is the size of the table.
           for(d <- 1 to 2){//Number of Rows.
                st.setInt(1,d)//First Column.
-               for(f<-1 to colparam){
-                    var random_string = A(Random.nextInt(A.size))//Get Random Strings from the List.
-                    println(random_string)
-                    st.setString(1 + f, random_string)//Random string for each column.
+               for(f <- 1 to colparam){
+                    //Checking Data..
+                    //println(randData(datacounter))
+                    st.setString(1 + f, randData(datacounter))//Random string for each column.
+                    datacounter = datacounter + 1
                }
                st.addBatch()//This makes the trick for efficient "insert into Multiple Rows".
                count += 1
@@ -153,6 +156,18 @@ class ModelTemplate extends Model{
           }
      }
 
+     //Create a list of random data and pass it to the add_Data functions(Model and Oracle).
+     @Before
+     def create_data{
+       for(i <- 1 to colparam * 2){
+         //get a random string.
+         var random_string = A(Random.nextInt(A.size))
+         //and add it in the list.
+         randData = randData :+ random_string
+       }
+       //println(randData) Prints the enitre vector, Debugging.
+     }
+
      //Drop everything before the transitions.
      @Before
      def dropTables{
@@ -201,7 +216,7 @@ class ModelTemplate extends Model{
      //Example Exception
      //Postgres exception org.postgresql.util.PSQLException: ERROR: duplicate key value violates unique constraint "table9_pkey"
      //Detail: Key (column2)=(String2) already exists. at add_data:
-     "test PK" -> "add data" := add_data
+     "test PK" -> "add data" := add_data(randData)
 
      //"add cols" -> "add primary key" := add_pks
      //"add primary key" -> "test primary key" := test_pk//test Primary key
