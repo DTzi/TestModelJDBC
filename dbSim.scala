@@ -5,7 +5,7 @@ import scala.collection.mutable.HashSet
 
 
 class dbSim{
-  var myarray = Array.ofDim[Any](5,10)
+  var myarray = Array.ofDim[Any](2,10)
   val A = List("String1", "String2", "String3",
     "String4")//Using a small list for debugging.
   var initialized = false//checks if table has already initialized.
@@ -76,11 +76,13 @@ class dbSim{
     }
   }
 
-  def addData(a:Int){
+  def addData(a:Int, data:Vector[String]){
+    var datacounter = 0
     for(i <- 0 to myarray.length-1){
       for(j <- 1 to a){
-        var random_string = A(Random.nextInt(A.size))
-        myarray(i)(j) = random_string
+        //println(data(datacounter))
+        myarray(i)(j) = data(datacounter)
+        datacounter = datacounter + 1
       }
     }
     addPkUtil(trackPk.last)//call the helper function to check if duplicates exist in the Primary Key Col.
