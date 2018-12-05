@@ -161,7 +161,8 @@ class ModelTemplate extends Model{
      def create_data{
        for(i <- 1 to colparam * 2){
          //get a random string.
-         var random_string = A(Random.nextInt(A.size))
+         var random_string = A(choose(0, A.size))
+         println(random_string)
          //and add it in the list.
          randData = randData :+ random_string
        }
@@ -169,7 +170,7 @@ class ModelTemplate extends Model{
 
      //Drop everything before the transitions.
      @Before
-     def dropTables{
+     def drop_Tables{
        for(i <- 0 to 9){
          table = "table" + i
          var dropTable = con.createStatement()
@@ -184,8 +185,6 @@ class ModelTemplate extends Model{
           val modelResult = dbSim.action(params)
           checkResult(systemResult, modelResult)
     }*/
-
-     //"Drop everything before Init" -> "Init" := dropTables
 
      "Init" -> "create table" :={
           val createtableModel = create_table(tableparam)
@@ -211,14 +210,15 @@ class ModelTemplate extends Model{
      "add primary key" -> "test PK" :={
           assert(pk_exists() == mylist(tableparam).returnPK())
      }
-
      //Example Exception
      //Postgres exception org.postgresql.util.PSQLException: ERROR: duplicate key value violates unique constraint "table9_pkey"
      //Detail: Key (column2)=(String2) already exists. at add_data:
      "test PK" -> "add data" :={
-       add_data(randData)
-       mylist(tableparam).addData(colparam, randData)
+          add_data(randData)
+          mylist(tableparam).addData(colparam, randData)
      }
+
+     //Old Transitions
      //"add cols" -> "add primary key" := add_pks
      //"add primary key" -> "test primary key" := test_pk//test Primary key
      //"test primary key" -> "check if table exists" :=test_table//detect if table exists and table Name.
