@@ -1,6 +1,5 @@
 package modbat
 import Array._
-import scala.util.Random
 import scala.collection.mutable.HashSet
 
 
@@ -29,8 +28,8 @@ class dbSim{
     }
   }
 
+  //Table exists-test Function.
   def returntable() :Boolean ={
-     //test Function.
      return initialized
   }
 
