@@ -1,8 +1,5 @@
 package modbat
-import scala.util.Random
-import java.sql.Connection
-import java.sql.DriverManager
-import java.sql.PreparedStatement
+import java.sql.{Connection, DriverManager, SQLException}
 
 import modbat.dsl._
 //modbat.dsl.Model.assert
@@ -75,6 +72,10 @@ class ModelTemplate extends Model{
                     st.executeBatch()
                }
                var rs = st.executeUpdate()
+               //Verify that the Insertion was successful and assert.
+               //var count = stmt.executeUpdate()
+               //action = (count > 0) <- something like this?
+
           }
      }
 
@@ -100,11 +101,12 @@ class ModelTemplate extends Model{
           //Inner Join
           var Inner_join = con.createStatement()
           //Requires(n_table >= 2)
-          var random_joins = colArray(Random.nextInt(colArray.size))
+          var random_joins = colArray(choose(0, colArray.size))
           //System.out.println("first random table " + random_joins)
           colArray = colArray.filterNot(_ == random_joins)
           //var new_random_joins = colArray.filter(_ != random_joins)
-          var second_joins = colArray(Random.nextInt(colArray.size))
+          //colArray(Random.nextInt(colArray.size))
+          var second_joins = colArray(choose(0, colArray.size))
           var rs = Inner_join.executeQuery("SELECT table" + random_joins + ".column1, table" + second_joins + ".column1 AS COL1 FROM table" + random_joins + " INNER JOIN table" + second_joins +" ON table" +random_joins + ".column0= table" + second_joins + ".column0")
           System.out.println("Col, Data:")
           while (rs.next()) {
@@ -160,10 +162,7 @@ class ModelTemplate extends Model{
      @Before
      def create_data{
        for(i <- 1 to colparam * 2){
-         //get a random string.
          var random_string = A(choose(0, A.size))
-         println(random_string)
-         //and add it in the list.
          randData = randData :+ random_string
        }
      }
@@ -214,8 +213,12 @@ class ModelTemplate extends Model{
      //Postgres exception org.postgresql.util.PSQLException: ERROR: duplicate key value violates unique constraint "table9_pkey"
      //Detail: Key (column2)=(String2) already exists. at add_data:
      "test PK" -> "add data" :={
+       try{
           add_data(randData)
           mylist(tableparam).addData(colparam, randData)
+        }catch{
+          case e: SQLException => e.printStackTrace
+        }
      }
 
      //Old Transitions
