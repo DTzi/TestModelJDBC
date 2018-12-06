@@ -46,7 +46,7 @@ class ModelTemplate extends Model{
           stat.executeUpdate(complete_add_pks)
      }
 
-     def add_data(data:Vector[String]){
+     def add_data(data:Vector[String]) :Boolean ={
           //if there are duplicates in PK col, throw org.postgresql.util.PSQLException: ERROR: multiple primary keys for table "table" are not allowed.
           var sample="( ?"//named prepared_statement for data.
           for(b<-1 to colparam){
@@ -58,24 +58,30 @@ class ModelTemplate extends Model{
           var st = con.prepareStatement(query)
           var count = 0
           var datacounter = 0//Counts up to colparam * 2, which represents the columns * 2 rows.
+          var returnResult = 0//Store the result of executeUpdate.
           for(d <- 1 to 2){//Number of Rows.
                st.setInt(1,d)//First Column.
                for(f <- 1 to colparam){
                     //Checking Data..
                     //println(randData(datacounter))
                     st.setString(1 + f, randData(datacounter))//Random string for each column.
-                    datacounter = datacounter + 1
+                    datacounter += 1
                }
                st.addBatch()//This makes the trick for efficient "insert into Multiple Rows".
                count += 1
                if (count % 10 == 0){
                     st.executeBatch()
                }
-               var rs = st.executeUpdate()
-               //Verify that the Insertion was successful and assert.
-               //var count = stmt.executeUpdate()
-               //action = (count > 0) <- something like this?
-
+               var rs = st.executeUpdate()//Returns: either (1) the row count for SQL Data Manipulation Language (DML) statements
+                                          //or (2) 0 for SQL statements that return nothing
+               returnResult = rs
+          }
+          //check if executeUpdate is successful.
+          if(returnResult > 0){
+            return true
+          }
+          else{
+            return false
           }
      }
 
@@ -214,19 +220,21 @@ class ModelTemplate extends Model{
      //Detail: Key (column2)=(String2) already exists. at add_data:
      "test PK" -> "add data" :={
        try{
-          add_data(randData)
-          mylist(tableparam).addData(colparam, randData)
+          val modelInsert = add_data(randData)
+          val dbSimInsert = mylist(tableparam).addData(colparam, randData)
+          assert(modelInsert == dbSimInsert)
         }catch{
-          case e: SQLException => e.printStackTrace
+          case e: SQLException => e.printStackTrace//Ignore SQLException.
         }
-     }
+     }/*label "SQLException" catches("SQLException" -> "Check ExceptionIsValid") -> Go to the next Transition and check result.
+     "check ExceptionIsValid" -> "Next"
+     "add data" -> "test data" := data_exist*/
 
      //Old Transitions
      //"add cols" -> "add primary key" := add_pks
      //"add primary key" -> "test primary key" := test_pk//test Primary key
      //"test primary key" -> "check if table exists" :=test_table//detect if table exists and table Name.
      //"check if table exists" -> "get number of columns" := test_cols//get the number of columns.
-
      //"create table" -> "add primary key" := add_pks
      //"add primary key" -> "test exception pk" := add_pks
      //"create table" -> "add columns" :=add_columns
@@ -238,6 +246,4 @@ class ModelTemplate extends Model{
      //"add columns to the new table" -> "remove one random column" :=drop_column
      //"add columns to the new table" -> "add data to the new table" :=add_data
      //"add data to the new table" -> "add joins" :=joins
-
-
-}
+    }
