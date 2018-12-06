@@ -75,23 +75,26 @@ class dbSim{
     }
   }
 
-  def addData(a:Int, data:Vector[String]){
+  //Add row param for the first itteration.
+  def addData(a:Int, data:Vector[String]) :Boolean ={
     var datacounter = 0
     for(i <- 0 to myarray.length-1){
       for(j <- 1 to a){
         //println(data(datacounter))
         myarray(i)(j) = data(datacounter)
-        datacounter = datacounter + 1
+        datacounter += 1
       }
     }
-    addPkUtil(trackPk.last)//call the helper function to check if duplicates exist in the Primary Key Col.
+    //addPkUtil(trackPk.last)//call the helper function to check if duplicates exist in the Primary Key Col.
+    return true
   }
 
   //helper function to find pk-duplicates.
+  //catch the transition?
   def addPkUtil(a:Int){
     val mySet = HashSet.empty[Any]
     for(i <- 0 to myarray.length-1){
-      if(mySet.contains(myarray(i)(a))) println("duplicate")
+      if(mySet.contains(myarray(i)(a))) println("duplicate")//Return false, if we have Duplicates.
         mySet += myarray(i)(a)
     }
   }
