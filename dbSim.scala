@@ -1,6 +1,7 @@
 package modbat
 import Array._
 import scala.collection.mutable.HashSet
+import java.sql.{SQLException}
 
 
 class dbSim{
@@ -56,8 +57,7 @@ class dbSim{
 
   def addPk(a:Int){
     if(trackPk.contains(a)){
-      //throw org.postgresql.util.PSQLException: ERROR: multiple primary keys for table "table" are not allowed
-      println("table has already a PK")
+      //println("table has already a PK")
     }
     else{
       trackPk = trackPk :+ a
@@ -76,25 +76,24 @@ class dbSim{
   }
 
   //Add row param for the first itteration.
-  def addData(a:Int, data:Vector[String]) :Boolean ={
+  def addData(a:Int, data:Vector[String]){
     var datacounter = 0
     for(i <- 0 to myarray.length-1){
       for(j <- 1 to a){
-        //println(data(datacounter))
-        myarray(i)(j) = data(datacounter)
-        datacounter += 1
+      //println(data(datacounter))
+      myarray(i)(j) = data(datacounter)
+      datacounter += 1
       }
     }
-    //addPkUtil(trackPk.last)//call the helper function to check if duplicates exist in the Primary Key Col.
-    return true
+  //addPkUtil(trackPk.last)//call the helper function to check if duplicates exist in the Primary Key Col.
   }
 
   //helper function to find pk-duplicates.
-  //catch the transition?
+  //catch the Exception?
   def addPkUtil(a:Int){
     val mySet = HashSet.empty[Any]
     for(i <- 0 to myarray.length-1){
-      if(mySet.contains(myarray(i)(a))) println("duplicate")//Return false, if we have Duplicates.
+      if(mySet.contains(myarray(i)(a))) throw new  SQLException("FOUND DUPLICATE")
         mySet += myarray(i)(a)
     }
   }
@@ -136,18 +135,18 @@ object dbSim{
     for(i <- 0 to mylist.length-1){
       mylist(i) = new dbSim()
     }
-    //get params through JDBC MODEL.
-    //Operations following JDBC model's transitions.
-    //Create table.
-    /*mylist(0).createTable()
+    /*get params through JDBC MODEL.
+    Operations following JDBC model's transitions.
+    Create table.
+    mylist(0).createTable()
     mylist(0).createTable()//fails with ERROR: relation "table" already exists
-    //add 2 empty columns.
+    add 2 empty columns.
     mylist(0).addCols(2)
-    //add pk to the table.
+    add pk to the table.
     mylist(0).addPk(1)
-    //add some data and check if there are any duplicates in the Primary Key Column.
+    add some data and check if there are any duplicates in the Primary Key Column.
     mylist(0).addData(2)
-    //delete the third Column.
+    delete the third Column.
     mylist(0).deleteCol(2)
     mylist(0).printArray()*/
 
