@@ -23,6 +23,8 @@ class ModelTemplate extends Model{
     }
      val tableparam = choose(1, 10)//Table Parameter
      var table = ""
+     val pkparam = choose(1, colparam)//Need for Test Functions
+
 
 
      def create_table(a:Int){
@@ -157,6 +159,18 @@ class ModelTemplate extends Model{
           }
      }
 
+     //Test Duplicate data
+     def duplicate_exist() :Boolean ={
+         var checkDups = con.prepareStatement("SELECT COUNT(COLUMN" + pkparam + ") FROM " + table + " GROUP BY COLUMN" + pkparam)
+         var rs = checkDups.executeQuery()
+         if (rs.next()){
+               return true
+         }
+         else{
+               return false
+         }
+    }
+
      //Create a list of random data and pass it to the add_Data functions(Model and Oracle).
      @Before
      def create_data{
@@ -200,7 +214,6 @@ class ModelTemplate extends Model{
           assert(testColsModel == testColsdbSim)
      }
      "test columns" -> "add primary key" :={
-          val pkparam = choose(1, colparam)
           val addpkModel = add_pks(pkparam)
           val addpkdbSim = mylist(tableparam).addPk(pkparam)
           //assert PKS.
@@ -208,21 +221,32 @@ class ModelTemplate extends Model{
      "add primary key" -> "test PK" :={
           assert(pk_exists() == mylist(tableparam).returnPK())
      }
+
      //Example Exception
      //Postgres exception org.postgresql.util.PSQLException: ERROR: duplicate key value violates unique constraint "table9_pkey"
      //Detail: Key (column2)=(String2) already exists. at add_data:
-     "test PK" -> "add data" :={
-       try{
+
+     //"test PK" -> "add data" :={
+      /*try{
+         val modelInsert = add_data(randData)
+         val dbSimInsert = mylist(tableparam).addData(colparam, randData)
+         assert(modelInsert == dbSimInsert)
+       }catch{
+         case e: SQLException => e.printStackTrace//Ignore SQLException.
+       }
+    }*/
+
+    "test PK" -> "add data" :={
           val modelInsert = add_data(randData)
           val dbSimInsert = mylist(tableparam).addData(colparam, randData)
-        }catch{
-          case e: SQLException => e.printStackTrace//Ignore SQLException.
-        }
-     }/*label "SQLException" catches("SQLException" -> "Check ExceptionIsValid") -> Go to the next Transition and check result.
-     "check ExceptionIsValid" -> "Next"
-     // handle the exception in a meaningful way - do not just rethrow it!
+          //assert(modelInsert == dbSimInsert)
+        }catches("SQLException" -> "checkDups")
 
-     "add data" -> "test data" := data_exist*/
+    "checkDups" -> "NextTransition" :={
+          //handle the exception here.
+          val bool = duplicate_exist()
+          println(bool)//assert goes here.
+    }
 
      //Old Transitions
      //"add cols" -> "add primary key" := add_pks

@@ -80,9 +80,9 @@ class dbSim{
     var datacounter = 0
     for(i <- 0 to myarray.length-1){
       for(j <- 1 to a){
-      //println(data(datacounter))
-      myarray(i)(j) = data(datacounter)
-      datacounter += 1
+       //println(data(datacounter))
+       myarray(i)(j) = data(datacounter)
+       datacounter += 1
       }
     }
   //addPkUtil(trackPk.last)//call the helper function to check if duplicates exist in the Primary Key Col.
