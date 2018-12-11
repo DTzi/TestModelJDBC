@@ -59,7 +59,6 @@ class ModelTemplate extends Model{
           var st = con.prepareStatement(query)
           var count = 0
           var datacounter = 0//Counts up to colparam * 2, which represents the columns * 2 rows.
-          var returnResult = 0//Store the result of executeUpdate.
           for(d <- 1 to 2){//Number of Rows.
                st.setInt(1,d)//First Column.
                for(f <- 1 to colparam){
@@ -73,11 +72,8 @@ class ModelTemplate extends Model{
                if (count % 10 == 0){
                     st.executeBatch()
                }
-               var rs = st.executeUpdate()//Returns: either (1) the row count for SQL Data Manipulation Language (DML) statements
-                                          //or (2) 0 for SQL statements that return nothing
-               returnResult = rs
+               var rs = st.executeUpdate()
           }
-          //check if executeUpdate is successful.
      }
 
      def change_dataType{
@@ -159,8 +155,8 @@ class ModelTemplate extends Model{
           }
      }
 
-     //Test Duplicate data
-     def duplicate_exist() :Boolean ={
+     //Test Duplicate data - Don't need the function for now, MAYBE later?
+     /*def duplicate_exist() :Boolean ={
          var checkDups = con.prepareStatement("SELECT COUNT(COLUMN" + pkparam + ") FROM " + table + " GROUP BY COLUMN" + pkparam)
          var rs = checkDups.executeQuery()
          if (rs.next()){
@@ -169,7 +165,7 @@ class ModelTemplate extends Model{
          else{
                return false
          }
-    }
+    }*/
 
      //Create a list of random data and pass it to the add_Data functions(Model and Oracle).
      @Before
@@ -237,15 +233,18 @@ class ModelTemplate extends Model{
     }*/
 
     "test PK" -> "add data" :={
-          val modelInsert = add_data(randData)
           val dbSimInsert = mylist(tableparam).addData(colparam, randData)
+          val modelInsert = add_data(randData)
           //assert(modelInsert == dbSimInsert)
-        }catches("SQLException" -> "checkDups")
+          //Always true, unless there is an Exception, maybe don't need to test it at all.
+    }catches("SQLException" -> "check Duplicates")
 
-    "checkDups" -> "NextTransition" :={
-          //handle the exception here.
-          val bool = duplicate_exist()
-          println(bool)//assert goes here.
+    "check Duplicates" -> "Next Transition" :={
+          //Test the exception here.
+          //mylist(tableparam).printArray() - print before removing dups.
+          val dbSimDuplicates = mylist(tableparam).check_for_pkDuplicates(pkparam, colparam)
+          assert(dbSimDuplicates)
+          //mylist(tableparam).printArray() - print after removing dups.
     }
 
      //Old Transitions

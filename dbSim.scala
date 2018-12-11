@@ -10,7 +10,7 @@ class dbSim{
     "String4")//Using a small list for debugging.
   var initialized = false//checks if table has already initialized.
   var trackPk = Vector[Int]()//tracks Primary Keys.
-
+  var returnDups = false
   def createTable(){
     //First check if table already exists.
     if (initialized == true) {
@@ -85,17 +85,26 @@ class dbSim{
        datacounter += 1
       }
     }
-  //addPkUtil(trackPk.last)//call the helper function to check if duplicates exist in the Primary Key Col.
   }
 
-  //helper function to find pk-duplicates.
-  //catch the Exception?
-  def addPkUtil(a:Int){
+  //function to find pk-duplicates.
+  def check_for_pkDuplicates(a:Int, b:Int) :Boolean = {
     val mySet = HashSet.empty[Any]
     for(i <- 0 to myarray.length-1){
-      if(mySet.contains(myarray(i)(a))) throw new  SQLException("FOUND DUPLICATE")
-        mySet += myarray(i)(a)
+      mySet += myarray(i)(a)
+      if(mySet.contains(myarray(i)(a))){
+        returnDups = true
+        clearDupsArray(b)//call it to clear the Duplicates row.
+      }
     }
+    return returnDups
+  }
+
+  def clearDupsArray(a:Int){
+      for(j <- 1 to a){
+       //println(data(datacounter))
+       myarray(1)(j) = 0
+     }
   }
 
   def deleteCol(a:Int){
