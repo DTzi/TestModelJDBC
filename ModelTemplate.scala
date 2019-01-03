@@ -76,43 +76,6 @@ class ModelTemplate extends Model{
           }
      }
 
-     def change_dataType{
-          for(x <- colArray) {
-               if (x != 0) {
-                    val pkcol = choose(0, x)//assign random_number according to the number of columns.
-               }
-               else{
-                    pkcol = 0
-               }
-               var string1 = "ALTER table "+table + " ALTER COLUMN " + " column" + pkcol
-               var string2 = " TYPE INT"
-               var final_string = string1.concat(string2)
-               var string3 = " USING " + "column" + pkcol + " ::integer"
-               var final_ = final_string.concat(string3)
-               //println(final_)
-               stat.executeUpdate(final_)
-          }
-     }
-
-     def joins{
-          //Inner Join
-          var Inner_join = con.createStatement()
-          //Requires(n_table >= 2)
-          var random_joins = colArray(choose(0, colArray.size))
-          //System.out.println("first random table " + random_joins)
-          colArray = colArray.filterNot(_ == random_joins)
-          //var new_random_joins = colArray.filter(_ != random_joins)
-          //colArray(Random.nextInt(colArray.size))
-          var second_joins = colArray(choose(0, colArray.size))
-          var rs = Inner_join.executeQuery("SELECT table" + random_joins + ".column1, table" + second_joins + ".column1 AS COL1 FROM table" + random_joins + " INNER JOIN table" + second_joins +" ON table" +random_joins + ".column0= table" + second_joins + ".column0")
-          System.out.println("Col, Data:")
-          while (rs.next()) {
-               var column1 = rs.getString("Column1")
-               var column2 = rs.getString("COL1")
-               System.out.println("    " + column1 + ", " + column2)
-          }
-     }
-
      def drop_column{
           //pkcol = myRng.nextInt(col)
           val pkcol = choose(1, colparam)
@@ -154,18 +117,6 @@ class ModelTemplate extends Model{
                return false
           }
      }
-
-     //Test Duplicate data - Don't need the function for now, MAYBE later?
-     /*def duplicate_exist() :Boolean ={
-         var checkDups = con.prepareStatement("SELECT COUNT(COLUMN" + pkparam + ") FROM " + table + " GROUP BY COLUMN" + pkparam)
-         var rs = checkDups.executeQuery()
-         if (rs.next()){
-               return true
-         }
-         else{
-               return false
-         }
-    }*/
 
      //Create a list of random data and pass it to the add_Data functions(Model and Oracle).
      @Before
@@ -221,16 +172,6 @@ class ModelTemplate extends Model{
      //Example Exception
      //Postgres exception org.postgresql.util.PSQLException: ERROR: duplicate key value violates unique constraint "table9_pkey"
      //Detail: Key (column2)=(String2) already exists. at add_data:
-
-     //"test PK" -> "add data" :={
-      /*try{
-         val modelInsert = add_data(randData)
-         val dbSimInsert = mylist(tableparam).addData(colparam, randData)
-         assert(modelInsert == dbSimInsert)
-       }catch{
-         case e: SQLException => e.printStackTrace//Ignore SQLException.
-       }
-    }*/
 
     "test PK" -> "add data" :={
           val dbSimInsert = mylist(tableparam).addData(colparam, randData)
