@@ -1,4 +1,3 @@
-
 package modbat
 import Array._
 import scala.collection.mutable.HashSet
@@ -12,6 +11,8 @@ class dbSim{
   var initialized = false//checks if table has already initialized.
   var trackPk = Vector[Int]()//tracks Primary Keys.
   var returnDuplicates = false
+
+
   def createTable(){
     //First check if table already exists.
     if (initialized == true) {
