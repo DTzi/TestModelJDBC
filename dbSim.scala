@@ -1,3 +1,4 @@
+
 package modbat
 import Array._
 import scala.collection.mutable.HashSet
@@ -10,7 +11,7 @@ class dbSim{
     "String4")//Using a small list for debugging.
   var initialized = false//checks if table has already initialized.
   var trackPk = Vector[Int]()//tracks Primary Keys.
-  var returnDups = false
+  var returnDuplicates = false
   def createTable(){
     //First check if table already exists.
     if (initialized == true) {
@@ -76,33 +77,37 @@ class dbSim{
   }
 
   //Add row param for the first itteration.
-  def addData(a:Int, data:Vector[String]){
+  def addData(a:Int, data:Vector[String], dates:Vector[String], types:Vector[Int]){
     var datacounter = 0
     for(i <- 0 to myarray.length-1){
       for(j <- 1 to a){
+        if(types(datacounter) == 1){
+          myarray(i)(j) = dates(datacounter)
+        }
+        else{
+          myarray(i)(j) = data(datacounter)
+        }
        //println(data(datacounter))
-       myarray(i)(j) = data(datacounter)
        datacounter += 1
       }
     }
   }
 
-  //function to find pk-duplicates.
+  //function to find Primary Key-duplicates.
   def check_for_pkDuplicates(a:Int, b:Int) :Boolean = {
     val mySet = HashSet.empty[Any]
     for(i <- 0 to myarray.length-1){
       mySet += myarray(i)(a)
       if(mySet.contains(myarray(i)(a))){
-        returnDups = true
-        clearDupsArray(b)//call it to clear the Duplicates row.
+        returnDuplicates = true
+        clearDuplicates(b)//call it to clear the row with Duplicates.
       }
     }
-    return returnDups
+    return returnDuplicates
   }
 
-  def clearDupsArray(a:Int){
+  def clearDuplicates(a:Int){
       for(j <- 1 to a){
-       //println(data(datacounter))
        myarray(1)(j) = 0
      }
   }
