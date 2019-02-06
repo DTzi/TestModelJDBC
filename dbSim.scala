@@ -1,39 +1,37 @@
 package modbat
 import Array._
-import scala.collection.mutable.HashSet
+import scala.collection.mutable.HashSet//For Duplicates.
 import java.sql.{SQLException}
 
 
-class dbSim{
-  var myarray = Array.ofDim[Any](2,10)
-  val A = List("String1", "String2", "String3",
-    "String4")//Using a small list for debugging.
-  var initialized = false//checks if table has already initialized.
-  var trackPk = Vector[Int]()//tracks Primary Keys.
-  var returnDuplicates = false
+ class dbSim(var init:Boolean, var prkey:Boolean, var dupes:Boolean, val myarray:Array[Array[Any]]) extends Cloneable{
 
+ override def clone = new dbSim(init, prkey, dupes, myarray.clone)
 
+ //Deep Copy the DB table.
+ for (i <- 0 to myarray.length - 1) {
+      myarray(i) = myarray(i).clone
+    }
+  
   def createTable(){
     //First check if table already exists.
-    if (initialized == true) {
+    if (init == true) {
       //throw org.postgresql.util.PSQLException: ERROR: relation "table" already exists
-      println("Table already exists")
     }
     //If not, initialise it.
     else{
-      initialized = true
-      var init = 0
+      init = true
+      var initcount = 0
       for(i <- 0 to myarray.length-1){
-        init += 1
-        myarray(i)(0) = init
+        initcount += 1
+        myarray(i)(0) = initcount
       }
-      //println("table created!")
     }
   }
 
   //Table exists-test Function.
   def returntable() :Boolean ={
-     return initialized
+     return init
   }
 
   //Function to test number of Columns in the JDBC model.
@@ -58,18 +56,18 @@ class dbSim{
   }
 
   def addPk(a:Int){
-    if(trackPk.contains(a)){
+    if(prkey == true){
       //println("table has already a PK")
     }
     else{
-      trackPk = trackPk :+ a
+      prkey = true
       //println("PK added")
     }
   }
 
   //Test PK.
   def returnPK() :Boolean ={
-    if(trackPk.isEmpty){
+    if(prkey == false){
       return false
     }
     else{
@@ -100,11 +98,11 @@ class dbSim{
     for(i <- 0 to myarray.length-1){
       mySet += myarray(i)(a)
       if(mySet.contains(myarray(i)(a))){
-        returnDuplicates = true
+        dupes = true
         clearDuplicates(b)//call it to clear the row with Duplicates.
       }
     }
-    return returnDuplicates
+    return dupes
   }
 
   def clearDuplicates(a:Int){
@@ -122,7 +120,7 @@ class dbSim{
 
   def deleteTable(){
     //Remove primary key first.
-    trackPk = trackPk.filterNot(_ == trackPk.last)
+    prkey = false
     //And delete everything in the table.
     for(i <- 0 to myarray.length-1){
       for(j <- 0 to myarray(0).length-1){
@@ -139,18 +137,21 @@ class dbSim{
       }
       println()
     }
+      println(init)
   }
 }
 
 object dbSim{
   def main(args: Array[String]){
-    //Create an array of objects.
+    /*Create an array of objects.
     var mylist:Array[dbSim]= new Array[dbSim](10)
-    //Create the objects.
+    Create the objects.
     for(i <- 0 to mylist.length-1){
       mylist(i) = new dbSim()
+      //mylist(i) = new dbSim(Array.ofDim[Any](2,10))
+
     }
-    /*get params through JDBC MODEL.
+    get params through JDBC MODEL.
     Operations following JDBC model's transitions.
     Create table.
     mylist(0).createTable()

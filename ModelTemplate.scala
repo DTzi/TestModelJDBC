@@ -20,12 +20,20 @@ class ModelTemplate extends Model{
      var pkcol = 0
      val colparam = choose(1, 9)//Number of Cols.
      var mylist:Array[dbSim]= new Array[dbSim](10)
-     for(i <- 0 to mylist.length-1){
-      mylist(i) = new dbSim()
-    }
+     val myarraytodc = Array.ofDim[Any](2,10)
      val tableparam = choose(1, 10)//Table Parameter
      var table = ""
      val pkparam = choose(1, colparam)//Need for Test Functions
+
+     //dbSim variables.
+     var initialized = false//checks if table has already initialized.
+     var trackPk = false//tracks Primary Keys.
+     var returnDuplicates = false
+     
+     //Create an array of objects.
+     for(i <- 0 to mylist.length-1){
+      mylist(i) = new dbSim(initialized, trackPk, returnDuplicates, myarraytodc)
+    }
 
 
 
@@ -178,75 +186,32 @@ class ModelTemplate extends Model{
           checkResult(systemResult, modelResult)
     }*/
 
-     "Init" -> "create table" :={
-          //put transactions inside the transitions.
-          val createtableModel = create_table(tableparam)
-          val createtabledbSim = mylist(tableparam).createTable()
-          //val throwserror = mylist(tableparam).createTable()//calling createTable() again throws error.
-          assert(table_exists(tableparam) == mylist(tableparam).returntable())
-     }
-     "create table" -> "add some columns" :={
-          add_columns(colparam)
-          mylist(tableparam).addCols(colparam)
-     }
-     "add some columns" -> "test columns" := {
-          val testColsModel = number_of_cols()
-          val testColsdbSim = mylist(tableparam).returnCols()
-          assert(testColsModel == testColsdbSim)
-     }
-     "test columns" -> "add primary key" :={
-          val addpkModel = add_pks(pkparam)
-          val addpkdbSim = mylist(tableparam).addPk(pkparam)
-          //assert PKS.
-     }
-     "add primary key" -> "test PK" :={
-          assert(pk_exists() == mylist(tableparam).returnPK())
-     }
 
-     //Example Exception
-     //Postgres exception org.postgresql.util.PSQLException: ERROR: duplicate key value violates unique constraint "table9_pkey"
-     //Detail: Key (column2)=(String2) already exists. at add_data:
+     //Transactions Example.
 
-     //"test PK" -> "add data" :={
-      /*try{
-         val modelInsert = add_data(randData)
-         val dbSimInsert = mylist(tableparam).addData(colparam, randData)
-         assert(modelInsert == dbSimInsert)
-       }catch{
-         case e: SQLException => e.printStackTrace//Ignore SQLException.
-       }
-    }*/
+     /*
+     "test Trans" -> "adddata" := { 
+     require(rollback)//Transition to the next state, but rollback has to be true?
+     }*/
 
-    "test PK" -> "add data" :={
-          val dbSimInsert = mylist(tableparam).addData(colparam, randData, randDates, randTypes)
-          //val dbSimPrint = mylist(tableparam).printArray()
-          val modelInsert = add_data(randData)
-          //assert(modelInsert == dbSimInsert)
-          //Always true, unless there is an Exception, maybe don't need to test it at all.
-    }catches("SQLException" -> "check Duplicates")
 
-    "check Duplicates" -> "Next Transition" :={
-          //Test the exception here.
-          //mylist(tableparam).printArray() - print before removing dups.
-          val dbSimDuplicates = mylist(tableparam).check_for_pkDuplicates(pkparam, colparam)
-          assert(dbSimDuplicates)
-          //mylist(tableparam).printArray() - print after removing dups.
-    }
+     "Init" -> "test Trans" :={
+          con.setAutoCommit(false)
+          create_table(tableparam)//Create a db table.
+          val copy = mylist(tableparam).clone//Deep Copy the empty instance.
+          mylist(tableparam).createTable()//Create a dbSim table.
+          assert(table_exists(tableparam) == mylist(tableparam).returntable())//Check the tables. 
 
-     //Old Transitions
-     //"add cols" -> "add primary key" := add_pks
-     //"add primary key" -> "test primary key" := test_pk//test Primary key
-     //"test primary key" -> "check if table exists" :=test_table//detect if table exists and table Name.
-     //"check if table exists" -> "get number of columns" := test_cols//get the number of columns.
-     //"create table" -> "add primary key" := add_pks
-     //"add primary key" -> "test exception pk" := add_pks
-     //"create table" -> "add columns" :=add_columns
-     //"add columns" -> "add primary key" :=add_pks
-     //"add primary key" -> "add data" :=add_data
-     //"add data" -> "override data" :=add_data
-     //"add data" -> "create another table" :=create_table
-     //"create another table" -> "add columns to the new table" :=add_columns
-     //"add columns to the new table" -> "remove one random column" :=drop_column
-     //"add columns to the new table" -> "add data to the new table" :=add_data
-     //"add data to the new table" -> "add joins" :=joins
-    }
+          
+          if(choose(0, 2) == 0){
+               con.commit()
+          }
+          else{
+               con.rollback()
+               //mylist(tableparam) = copy 
+               assert(table_exists(tableparam) == mylist(tableparam).returntable())//Check the tables again. 
+
+          }
+     }
+     
+}
