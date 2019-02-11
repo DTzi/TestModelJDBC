@@ -6,12 +6,14 @@ import java.sql.{SQLException}
 
  class dbSim(var init:Boolean, var prkey:Boolean, var dupes:Boolean, val myarray:Array[Array[Any]]) extends Cloneable{
 
- override def clone = new dbSim(init, prkey, dupes, myarray.clone)
-
- //Deep Copy the DB table.
- for (i <- 0 to myarray.length - 1) {
-      myarray(i) = myarray(i).clone
-    }
+  override def clone = { 
+    val clonedArray = myarray.clone 
+    //Deep Copy the DB table. 
+    for (i <- 0 to myarray.length - 1){ 
+      clonedArray(i) = myarray(i).clone 
+    } 
+    new dbSim(init, prkey, dupes, clonedArray) 
+  }  
   
   def createTable(){
     //First check if table already exists.
