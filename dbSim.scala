@@ -4,8 +4,9 @@ import scala.collection.mutable.HashSet//For Duplicates.
 import java.sql.{SQLException}
 
 
- class dbSim(var init:Boolean, var prkey:Boolean, var dupes:Boolean, val myarray:Array[Array[Any]]) extends Cloneable{
 
+ class dbSim(var init:Boolean, var prkey:Boolean, var dupes:Boolean, val myarray:Array[Array[Any]]) extends Cloneable{
+  
   override def clone = { 
     val clonedArray = myarray.clone 
     //Deep Copy the DB table. 
@@ -23,11 +24,11 @@ import java.sql.{SQLException}
     //If not, initialise it.
     else{
       init = true
-      var initcount = 0
+      /*var initcount = 0
       for(i <- 0 to myarray.length-1){
         initcount += 1
         myarray(i)(0) = initcount
-      }
+      }*/
     }
   }
 
@@ -48,7 +49,7 @@ import java.sql.{SQLException}
 
   //Test number of Columns.
   def returnCols() :Int ={
-    var countCols = 0
+    var countCols = 1
     for(j <- 0 to myarray(0).length-1){
       if(myarray(0)(j) != null){
         countCols += 1
@@ -75,6 +76,22 @@ import java.sql.{SQLException}
     else{
       return true
     }
+  }
+
+  //Test Data.
+  def returnData() :Boolean ={
+    var empty = false
+    for(j <- 1 to myarray(0).length-1){
+      if(myarray(0)(j) != null){
+        empty = true
+        return empty
+      }
+      else{
+        empty = false
+        return empty
+      }
+    }
+    empty
   }
 
   //Add row param for the first itteration.
@@ -139,7 +156,6 @@ import java.sql.{SQLException}
       }
       println()
     }
-      println(init)
   }
 }
 

@@ -1,3 +1,4 @@
+
 package modbat
 import java.sql.{Connection, DriverManager, SQLException}
 
@@ -20,11 +21,11 @@ class ModelTemplate extends Model{
      var pkcol = 0
      val colparam = choose(1, 9)//Number of Cols.
      var mylist:Array[dbSim]= new Array[dbSim](10)
-     val myarraytodc = Array.ofDim[Any](2,10)
+     val dbTable = Array.ofDim[Any](2,10)
      val tableparam = choose(1, 10)//Table Parameter
      var table = ""
      val pkparam = choose(1, colparam)//Need for Test Functions
-
+     var activeTransaction = false//toggle between Transitions.
      //dbSim variables.
      var initialized = false//checks if table has already initialized.
      var trackPk = false//tracks Primary Keys.
@@ -32,8 +33,10 @@ class ModelTemplate extends Model{
      
      //Create an array of objects.
      for(i <- 0 to mylist.length-1){
-      mylist(i) = new dbSim(initialized, trackPk, returnDuplicates, myarraytodc)
+      mylist(i) = new dbSim(initialized, trackPk, returnDuplicates, dbTable)
     }
+    //Initialise Cloned Object.
+     var copyInit = new dbSim(initialized, trackPk, returnDuplicates, dbTable)
 
 
 
@@ -98,12 +101,11 @@ class ModelTemplate extends Model{
               }
       }
 
-     def drop_column{
-          //pkcol = myRng.nextInt(col)
-          val pkcol = choose(1, colparam)
-          //System.out.println("DELETE COLUMN " + pkcol)
+     def drop_column(a:Int){
+          //val pkcol = choose(1, colparam)
+          //println(pkcol)
           var dropCols = con.createStatement ()
-          dropCols.executeUpdate ("ALTER TABLE " + table + " DROP COLUMN " + "column" + pkcol)
+          dropCols.executeUpdate ("ALTER TABLE " + table + " DROP COLUMN " + "column" + a)
      }
 
      //checkResult test functions
@@ -117,6 +119,18 @@ class ModelTemplate extends Model{
           }
           else {
                return false
+          }
+     }
+
+     //test if the table is populated.
+     def data_exist() :Boolean ={
+          var stmt = con.prepareStatement("SELECT * FROM " + table)
+          var rs = stmt.executeQuery()
+          if (!rs.next() ) {
+               return false
+          }
+          else{
+               return true
           }
      }
 
@@ -178,40 +192,67 @@ class ModelTemplate extends Model{
        }
      }
 
-     //Model Transition
-     /*a" -> "b" := {
-          val params = chooseParameter(s)
-          val systemResult = database.action(params)
-          val modelResult = dbSim.action(params)
-          checkResult(systemResult, modelResult)
-    }*/
+     //Transitions
 
-
-     //Transactions Example.
-
-     /*
-     "test Trans" -> "adddata" := { 
-     require(rollback)//Transition to the next state, but rollback has to be true?
-     }*/
-
-
-     "Init" -> "test Trans" :={
-          con.setAutoCommit(false)
-          create_table(tableparam)//Create a db table.
-          val copy = mylist(tableparam).clone//Deep Copy the empty instance.
-          mylist(tableparam).createTable()//Create a dbSim table.
-          assert(table_exists(tableparam) == mylist(tableparam).returntable())//Check the tables. 
-
-          
-          if(choose(0, 2) == 0){
+     "Start" -> "addData" :={
+          val modelInsert = add_data(randData)
+          val dbSimInsert = mylist(tableparam).addData(colparam, randData, randDates, randTypes)
+     }catches("SQLException" -> "addData")
+     "addData" -> "Init" :={
+          assert(table_exists(tableparam) == mylist(tableparam).returntable())
+     }
+     "Init" -> "createTables" :={
+          val createtableModel = create_table(tableparam)
+          val createtabledbSim = mylist(tableparam).createTable()
+          //Deep Copy an empty Instance.
+          copyInit = mylist(tableparam).clone
+          assert(table_exists(tableparam) == mylist(tableparam).returntable())
+     }
+     "createTables" -> "addCols" :={
+          add_columns(colparam)
+          mylist(tableparam).addCols(colparam)
+     }
+     "addCols" -> "testCols" := {
+          val testColsModel = number_of_cols()
+          val testColsdbSim = mylist(tableparam).returnCols()
+          assert(testColsModel == testColsdbSim)
+     }
+     "testCols" -> "addPK" :={
+          val addpkModel = add_pks(pkparam)
+          val addpkdbSim = mylist(tableparam).addPk(pkparam)
+     }
+     "addPK" -> "testPK" :={
+          assert(pk_exists() == mylist(tableparam).returnPK())
+     }
+     "testPK" -> "checkRequire" :={
+          activeTransaction = true//Enable Transactions Active.
+          con.setAutoCommit(false)//Begin Transaction.
+          //Deep Copy the current empty Instance.
+          val copy = mylist(tableparam).clone
+          //Add some Data.
+          mylist(tableparam).addData(colparam, randData, randDates, randTypes)
+          add_data(randData)
+          //Don't close the Transaction yet.
+     }catches("SQLException" -> "checkRequire")
+     "checkRequire" -> "fakecommit" :={
+          if(activeTransaction==false){
                con.commit()
+          }
+     }
+     "fakecommit" -> "commitOrrollback" :={
+          if(choose(0,2)==0){
+               con.commit()
+               assert(data_exist==mylist(tableparam).returnData()) 
           }
           else{
                con.rollback()
-               //mylist(tableparam) = copy 
-               assert(table_exists(tableparam) == mylist(tableparam).returntable())//Check the tables again. 
-
+               mylist(tableparam) = copyInit
+               assert(data_exist==mylist(tableparam).returnData()) 
           }
      }
+
      
+
+
+
 }
