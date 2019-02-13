@@ -79,19 +79,17 @@ import java.sql.{SQLException}
   }
 
   //Test Data.
-  def returnData() :Boolean ={
+  def returnData(a:Int) :Boolean ={
     var empty = false
-    for(j <- 1 to myarray(0).length-1){
+    for(j <- 1 to a){
       if(myarray(0)(j) != null){
         empty = true
-        return empty
       }
       else{
         empty = false
-        return empty
       }
     }
-    empty
+    return empty
   }
 
   //Add row param for the first itteration.

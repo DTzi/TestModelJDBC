@@ -1,4 +1,3 @@
-
 package modbat
 import java.sql.{Connection, DriverManager, SQLException}
 
@@ -242,12 +241,12 @@ class ModelTemplate extends Model{
      "fakecommit" -> "commitOrrollback" :={
           if(choose(0,2)==0){
                con.commit()
-               assert(data_exist==mylist(tableparam).returnData()) 
+               assert(data_exist==mylist(tableparam).returnData(colparam)) 
           }
           else{
                con.rollback()
                mylist(tableparam) = copyInit
-               assert(data_exist==mylist(tableparam).returnData()) 
+               assert(data_exist==mylist(tableparam).returnData(colparam)) 
           }
      }
 
