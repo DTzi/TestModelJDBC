@@ -6,6 +6,8 @@ import modbat.dsl._
 class ModelTemplate extends Model{
      Class.forName("org.postgresql.Driver")
      var con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/test_db","postgres", "admin")
+     //Mutation Connection 
+     //var con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/test")
      var databaseMetaData = con.getMetaData()//get the information needed for the test functions.
      var stat = con.createStatement()
      val A = List("String1", "String2", "String3",
