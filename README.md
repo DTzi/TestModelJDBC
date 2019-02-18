@@ -6,23 +6,16 @@ Run: scala -cp /Users/Username/Desktop/modbat/postgresql-42.2.22.jar:.: openmodb
 
 # Mutation Testing Configuration
 
-
 1. tar xvfz postgresql-11.2.tar.gz  
 2. cd postgresql-11.2  
 3. ./configure --prefix=/Users/Username/Desktop/postgresql-11.2  
 4. make  
 5. make install  
 6. mkdir /Users/Username/Desktop/postgresql-11.2/data  
-
-Create the clusters  
 7. initdb -D /Users/Username/Desktop/postgresql-11.2/data  
-
-Start The server  
 8. pg_ctl -D /Users/Username/Desktop/postgresql-11.2/data -l logfile start  
-
-Create Test DB  
 9. /Users/Username/Desktop/postgresql-11.2/bin/createdb test  
 10. /Users/Username/Desktop/postgresql-11.2/bin/psql test  
 
-Running the Tests  
+# Running the Tests  
 
