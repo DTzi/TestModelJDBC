@@ -16,11 +16,6 @@ Run: scala -cp /Users/Username/Desktop/modbat/postgresql-42.2.22.jar:.: openmodb
 8. pg_ctl -D /Users/Username/Desktop/postgresql-11.2/data -l logfile start  
 9. /Users/Username/Desktop/postgresql-11.2/bin/createdb test  
 10. /Users/Username/Desktop/postgresql-11.2/bin/psql test  
-
-# Running the Tests  
-
-1. Running the Tests Against a Temporary Installation  
-make check  
-2. Running the Tests Against an Existing Installation  
-make installcheck
+11. Running the Tests Against a Temporary Installation  make check  
+12. Running the Tests Against an Existing Installation  make installcheck
 
