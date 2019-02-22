@@ -19,3 +19,8 @@ Run: scala -cp /Users/Username/Desktop/modbat/postgresql-42.2.22.jar:.: openmodb
 
 # Running the Tests  
 
+1. Running the Tests Against a Temporary Installation  
+make check  
+2. Running the Tests Against an Existing Installation  
+make installcheck
+
