@@ -20,11 +20,11 @@ Run: scala -cp /Users/Username/Desktop/modbat/postgresql-42.2.22.jar:.: openmodb
 
 # Coverage
 
-./configure --enable-coverage ... OTHER OPTIONS ...
-make
-make check # or other test suite
-make coverage-html
+./configure --enable-coverage ... OTHER OPTIONS ...  
+make  
+make check # or other test suite  
+make coverage-html  
 
-To reset the execution counts between test runs, run:
+To reset the execution counts between test runs, run:  
 make coverage-clean
 
