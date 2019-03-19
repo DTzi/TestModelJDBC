@@ -20,8 +20,7 @@ Run: scala -cp /Users/Username/Desktop/modbat/postgresql-42.2.22.jar:.: openmodb
 
 # PostgreSQL Test Coverage Examination
 
-./configure --enable-coverage ... OTHER OPTIONS ...  
-make  
+./configure --enable-coverage --prefix=/Users/Username/Desktop/postgresql-10.5  
 make check # or other test suite  
 make coverage-html  
 
