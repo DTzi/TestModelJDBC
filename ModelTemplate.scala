@@ -5,11 +5,13 @@ import modbat.dsl._
 
 class ModelTemplate extends Model{
      Class.forName("org.postgresql.Driver")
+     var dbConnection = null
+     //Clean Installation Connection.
      var con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/test_db","postgres", "admin")
-     //Mutation Connection 
+     //Mut Connection.
      //var con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/test")
      var databaseMetaData = con.getMetaData()//get the information needed for the test functions.
-     var stat = con.createStatement()
+     var stat = con.createStatement()//Used by Primary Key.
      val A = List("String1", "String2", "String3",
           "String4", "String5", "String6", "String7", "String8")//create a list with random data to pass into add_data, in model and dbSim.
      val B = List("2011-09-28","2001-09-28","2001-11-28", "2001-10-01",
@@ -22,33 +24,33 @@ class ModelTemplate extends Model{
      var pkcol = 0
      val colparam = choose(1, 9)//Number of Cols.
      var mylist:Array[dbSim]= new Array[dbSim](10)
-     val dbTable = Array.ofDim[Any](2,10)
+     val myarraytodc = Array.ofDim[Any](2,10)
      val tableparam = choose(1, 10)//Table Parameter
      var table = ""
      val pkparam = choose(1, colparam)//Need for Test Functions
      var activeTransaction = false//toggle between Transitions.
+
      //dbSim variables.
-     var initialized = false//checks if table has already initialized.
+     var initialized = false//checks if table has been created.
      var trackPk = false//tracks Primary Keys.
-     var returnDuplicates = false
+     var returnDuplicates = false//check for Duplicate Data.
+     var copyInit = new dbSim(initialized, trackPk, returnDuplicates, myarraytodc)//Cloned object.
      
      //Create an array of objects.
      for(i <- 0 to mylist.length-1){
-      mylist(i) = new dbSim(initialized, trackPk, returnDuplicates, dbTable)
+      mylist(i) = new dbSim(initialized, trackPk, returnDuplicates, myarraytodc)
     }
-    //Initialise Cloned Object.
-     var copyInit = new dbSim(initialized, trackPk, returnDuplicates, dbTable)
 
-
-
+     //Create a table.
      def create_table(a:Int){
           table = "table" + a
           colArray = colArray :+ a//get table number.
           var createTable = con.createStatement()
           createTable.executeUpdate ("CREATE TABLE " + table
-               + "(column0 INTEGER )")
+               + "(column0 INTEGER )")//BOOLEAN
      }
 
+     //Add Cols.
      def add_columns(a:Int){
           var stz = con.createStatement()
           var data_types_counter = 0
@@ -66,11 +68,13 @@ class ModelTemplate extends Model{
           }
      }
 
+     //Add a Primary Key.
      def add_pks(a:Int){
           var complete_add_pks = "Alter table " + table + " Add primary key (Column" + a + ")"
           stat.executeUpdate(complete_add_pks)
      }
 
+     //Add Data according to Cols data type.
      def add_data(data:Vector[String]){
            var sample="( ?"//named prepared_statement for data.
            for(b<-1 to colparam){
@@ -82,9 +86,9 @@ class ModelTemplate extends Model{
            var count = 0
            var datacounter = 0//Counts up to colparam * 2, which represents the columns * 2 rows.
            for(d <- 1 to 2){//Number of Rows.
-                st.setInt(1,d)//First Column.
-                for(f <- 1 to colparam){
-                  if(randTypes(datacounter) == 1){
+               st.setInt(1,d)//First Column.
+               for(f <- 1 to colparam){
+                    if(randTypes(datacounter) == 1){
                     st.setDate(1 + f, java.sql.Date.valueOf(randDates(datacounter)))//Random Dates.
                     st.addBatch()//This makes the trick for efficient "insert into Multiple Rows".
                   }
@@ -102,14 +106,17 @@ class ModelTemplate extends Model{
               }
       }
 
-     def drop_column(a:Int){
-          //val pkcol = choose(1, colparam)
-          //println(pkcol)
+     //Delete a Col.
+     def drop_column{
+          //pkcol = myRng.nextInt(col)
+          val pkcol = choose(1, colparam)
+          //System.out.println("DELETE COLUMN " + pkcol)
           var dropCols = con.createStatement ()
-          dropCols.executeUpdate ("ALTER TABLE " + table + " DROP COLUMN " + "column" + a)
+          dropCols.executeUpdate ("ALTER TABLE " + table + " DROP COLUMN " + "column" + pkcol)
      }
 
      //checkResult test functions
+
      //test if table exists.
      def table_exists(a:Int) :Boolean ={
           table = "table" + a//Need to re-initialise? avoid always true error.
@@ -124,15 +131,41 @@ class ModelTemplate extends Model{
      }
 
      //test if the table is populated.
-     def data_exist() :Boolean ={
-          var stmt = con.prepareStatement("SELECT * FROM " + table)
-          var rs = stmt.executeQuery()
-          if (!rs.next() ) {
-               return false
+     //It is Broken.
+     def data_exists() :Boolean ={
+          var empty = false
+          var checkdata = con.prepareStatement("SELECT * FROM " + table)
+          var rs = checkdata.executeQuery()
+          if (!rs.next()) {
+               empty = false
           }
           else{
-               return true
+               empty = true
           }
+          rs.close()
+          empty
+     }
+
+     //test if the table is populated.
+     def data_exist() {
+          var empty = true
+          var resultsCounter = 0
+          var ps = con.prepareStatement("SELECT * FROM " + table)
+          val rs = ps.executeQuery()
+          //val ResultSet = statement.executeQuery(sql)
+          while(rs.next()){
+               resultsCounter += 1
+          }
+          println(resultsCounter)
+     }
+
+     //test number of rows
+     def row_count() {
+          var ps = con.prepareStatement("SELECT count(*) FROM " + table)
+          var rs = ps.executeQuery()
+          rs.next()
+          var count = rs.getInt(1)
+          println(count)
      }
 
      //test number of columns.
@@ -193,67 +226,87 @@ class ModelTemplate extends Model{
        }
      }
 
-     //Transitions
+     //Model Transition Protorype
+     /*a" -> "b" := {
+          val params = chooseParameter(s)
+          val systemResult = database.action(params)
+          val modelResult = dbSim.action(params)
+          checkResult(systemResult, modelResult)
+    }*/
 
-     "Start" -> "addData" :={
+     //DB Transitions-------------------------------------------------------------------------------------------------------------------------------------------
+     
+     "Start" -> "Init" :={
+          //Insert Data -> Test Fails.
           val modelInsert = add_data(randData)
           val dbSimInsert = mylist(tableparam).addData(colparam, randData, randDates, randTypes)
      }catches("SQLException" -> "addData")
      "addData" -> "Init" :={
+          //Check if table exists.
           assert(table_exists(tableparam) == mylist(tableparam).returntable())
      }
      "Init" -> "createTables" :={
+          //Create a table.
           val createtableModel = create_table(tableparam)
           val createtabledbSim = mylist(tableparam).createTable()
-          //Deep Copy an empty Instance.
+          //Deep Copy an empty Instance in case of Rolling back.
           copyInit = mylist(tableparam).clone
+          //Check if table exists.
           assert(table_exists(tableparam) == mylist(tableparam).returntable())
      }
      "createTables" -> "addCols" :={
+          //Add Cols.
           add_columns(colparam)
           mylist(tableparam).addCols(colparam)
      }
      "addCols" -> "testCols" := {
+          //Test Cols.
           val testColsModel = number_of_cols()
           val testColsdbSim = mylist(tableparam).returnCols()
           assert(testColsModel == testColsdbSim)
      }
      "testCols" -> "addPK" :={
+          //Add PK.
           val addpkModel = add_pks(pkparam)
           val addpkdbSim = mylist(tableparam).addPk(pkparam)
      }
      "addPK" -> "testPK" :={
+          //Test PK.
           assert(pk_exists() == mylist(tableparam).returnPK())
      }
      "testPK" -> "checkRequire" :={
+          //Begin Transaction.
           activeTransaction = true//Enable Transactions Active.
           con.setAutoCommit(false)//Begin Transaction.
-          //Deep Copy the current empty Instance.
-          val copy = mylist(tableparam).clone
           //Add some Data.
           mylist(tableparam).addData(colparam, randData, randDates, randTypes)
           add_data(randData)
           //Don't close the Transaction yet.
-     }catches("SQLException" -> "checkRequire")
-     "checkRequire" -> "fakecommit" :={
-          if(activeTransaction==false){
-               con.commit()
-          }
+     }catches("SQLException" -> "checkDups")
+     "checkDups" -> "checkRequire" :={
+          //Check for duplicates.
+          val dbSimDuplicates = mylist(tableparam).check_for_pkDuplicates(pkparam, colparam)
+          assert(dbSimDuplicates)
      }
-     "fakecommit" -> "commitOrrollback" :={
+     "checkRequire" -> "reopenCon" :={  
           if(choose(0,2)==0){
                con.commit()
-               assert(data_exist==mylist(tableparam).returnData(colparam)) 
+               con.close()
+               //check if data Exist.
           }
           else{
                con.rollback()
-               mylist(tableparam) = copyInit
-               assert(data_exist==mylist(tableparam).returnData(colparam)) 
+               mylist(tableparam) = copyInit//Clone
+               con.close()
           }
      }
-
+     "commitOrrollback" -> "checkEmptyT?" :={
+          con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/test_db","postgres", "admin")//reconnect to DB due to Transaction error.
+          assert(data_exists==mylist(tableparam).returnData(colparam))//We check if both tables contain data or not, after the Transaction. 
+     }
      
-
-
-
+     //TODO 
+     // dates
+     // fault Insert table 
+     // fault dates
 }
