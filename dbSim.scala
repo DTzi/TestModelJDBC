@@ -2,11 +2,13 @@ package modbat
 import Array._
 import scala.collection.mutable.HashSet//For Duplicates.
 import java.sql.{SQLException}
+import java.text.SimpleDateFormat
+import java.text.ParseException
 
 
 
  class dbSim(var init:Boolean, var prkey:Boolean, var dupes:Boolean, val myarray:Array[Array[Any]]) extends Cloneable{
-  
+
   override def clone = { 
     val clonedArray = myarray.clone 
     //Deep Copy the DB table. 
@@ -19,6 +21,7 @@ import java.sql.{SQLException}
   def createTable(){
     //First check if table already exists.
     if (init == true) {
+      //Do nothing.
       //throw org.postgresql.util.PSQLException: ERROR: relation "table" already exists
     }
     //If not, initialise it.
@@ -92,12 +95,25 @@ import java.sql.{SQLException}
     return empty
   }
 
+  //Test Date Input
+  def isValidDate(date:String) :Boolean ={
+      try{
+        val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
+        dateFormat.setLenient(false)
+        dateFormat.parse(date)
+        true
+      } catch {
+        case e: ParseException => false
+      }
+    }
+
   //Add row param for the first itteration.
   def addData(a:Int, data:Vector[String], dates:Vector[String], types:Vector[Int]){
     var datacounter = 0
     for(i <- 0 to myarray.length-1){
       for(j <- 1 to a){
         if(types(datacounter) == 1){
+          isValidDate(dates(datacounter))
           myarray(i)(j) = dates(datacounter)
         }
         else{
@@ -141,7 +157,7 @@ import java.sql.{SQLException}
     //And delete everything in the table.
     for(i <- 0 to myarray.length-1){
       for(j <- 0 to myarray(0).length-1){
-        myarray(i)(j) = 0
+        myarray(i)(j) = "NULL"
       }
     }
   }
