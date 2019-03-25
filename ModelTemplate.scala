@@ -29,6 +29,7 @@ class ModelTemplate extends Model{
      var table = ""
      val pkparam = choose(1, colparam)//Need for Test Functions
      var activeTransaction = false//toggle between Transitions.
+     var dupsflag = false
 
      //dbSim variables.
      var initialized = false//checks if table has been created.
@@ -189,7 +190,7 @@ class ModelTemplate extends Model{
      }
 
      //Create a list of random data and pass it to the add_Data functions(Model and Oracle).
-     @Before
+     //@Before
      def create_data{
        for(i <- 1 to colparam * 2){
          var random_string = A(choose(0, A.size))
@@ -197,8 +198,19 @@ class ModelTemplate extends Model{
        }
      }
 
+     def clear_data{
+          randData = scala.collection.immutable.Vector.empty
+          randDates = scala.collection.immutable.Vector.empty
+          randTypes = scala.collection.immutable.Vector.empty
+     }
+
+     def print_data{
+          //debug
+          println(randData)
+     }
+
      //Create a list of random dates.
-     @Before
+     //@Before
      def create_dates{
        for(i <- 1 to colparam * 2){
          var random_date = B(choose(0, B.size))
@@ -207,7 +219,7 @@ class ModelTemplate extends Model{
      }
 
      //Create a list of random datatypes before the Tests. Pass it to create Cols in Oracle and Model.
-     @Before
+     //@Before
      def choose_datatypes{
        for(i <- 1 to colparam){
          var random_data_type = choose(0, 2)
@@ -235,17 +247,13 @@ class ModelTemplate extends Model{
     }*/
 
      //DB Transitions-------------------------------------------------------------------------------------------------------------------------------------------
-     
-     "Start" -> "Init" :={
-          //Insert Data -> Test Fails.
-          val modelInsert = add_data(randData)
-          val dbSimInsert = mylist(tableparam).addData(colparam, randData, randDates, randTypes)
-     }catches("SQLException" -> "addData")
-     "addData" -> "Init" :={
-          //Check if table exists.
-          assert(table_exists(tableparam) == mylist(tableparam).returntable())
+
+     "Init data" -> "Init" :={
+          choose_datatypes
+          create_data
+          create_dates
      }
-     "Init" -> "createTables" :={
+     "Init" -> "Cols" :={
           //Create a table.
           val createtableModel = create_table(tableparam)
           val createtabledbSim = mylist(tableparam).createTable()
@@ -254,27 +262,27 @@ class ModelTemplate extends Model{
           //Check if table exists.
           assert(table_exists(tableparam) == mylist(tableparam).returntable())
      }
-     "createTables" -> "addCols" :={
+     "Cols" -> "testCols" :={
           //Add Cols.
           add_columns(colparam)
           mylist(tableparam).addCols(colparam)
      }
-     "addCols" -> "testCols" := {
+     "testCols" -> "PK" := {
           //Test Cols.
           val testColsModel = number_of_cols()
           val testColsdbSim = mylist(tableparam).returnCols()
           assert(testColsModel == testColsdbSim)
      }
-     "testCols" -> "addPK" :={
+     "PK" -> "testPK" :={
           //Add PK.
           val addpkModel = add_pks(pkparam)
           val addpkdbSim = mylist(tableparam).addPk(pkparam)
      }
-     "addPK" -> "testPK" :={
+     "testPK" -> "addData" :={
           //Test PK.
           assert(pk_exists() == mylist(tableparam).returnPK())
      }
-     "testPK" -> "checkRequire" :={
+     "addData" -> "checkCommit" :={
           //Begin Transaction.
           activeTransaction = true//Enable Transactions Active.
           con.setAutoCommit(false)//Begin Transaction.
@@ -282,13 +290,17 @@ class ModelTemplate extends Model{
           mylist(tableparam).addData(colparam, randData, randDates, randTypes)
           add_data(randData)
           //Don't close the Transaction yet.
-     }catches("SQLException" -> "checkDups")
-     "checkDups" -> "checkRequire" :={
-          //Check for duplicates.
+     }catches("SQLException" -> "checkDups")//Catches duplicate keys.
+     "checkDups" -> "Init data" :={
+          //In case of dups, Validate, close the current transaction, rollback the state of the Model, delete data and tables, and start over.
           val dbSimDuplicates = mylist(tableparam).check_for_pkDuplicates(pkparam, colparam)
-          assert(dbSimDuplicates)
+          assert(dbSimDuplicates)//validate dups.
+          con.rollback()//Close the Transaction.
+          mylist(tableparam) = copyInit//Rollback the state of the model.
+          clear_data//Delete everything.
+          drop_Tables//Delete tables.
      }
-     "checkRequire" -> "reopenCon" :={  
+     "checkCommit" -> "reopenCon" :={  
           if(choose(0,2)==0){
                con.commit()
                con.close()
@@ -300,13 +312,17 @@ class ModelTemplate extends Model{
                con.close()
           }
      }
-     "commitOrrollback" -> "checkEmptyT?" :={
+     "reopenCon" -> "insert Er1" :={
           con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/test_db","postgres", "admin")//reconnect to DB due to Transaction error.
           assert(data_exists==mylist(tableparam).returnData(colparam))//We check if both tables contain data or not, after the Transaction. 
      }
-     
-     //TODO 
-     // dates
-     // fault Insert table 
-     // fault dates
+     "insert Er1" -> "Er2" :={
+          //Creating the same table, should throw an Exception.
+          create_table(tableparam)
+          mylist(tableparam).createTable()
+     }catches("SQLException" -> "Err1")
+     "Err1" -> "Er2" :={
+          //More failed cases.
+     }
+    
 }
