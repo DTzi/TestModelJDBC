@@ -29,7 +29,6 @@ class ModelTemplate extends Model{
      var table = ""
      val pkparam = choose(1, colparam)//Need for Test Functions
      var activeTransaction = false//toggle between Transitions.
-     var dupsflag = false
 
      //dbSim variables.
      var initialized = false//checks if table has been created.
@@ -90,6 +89,8 @@ class ModelTemplate extends Model{
                st.setInt(1,d)//First Column.
                for(f <- 1 to colparam){
                     if(randTypes(datacounter) == 1){
+                    //Validate Dates.
+                    assert(mylist(tableparam).isValidDate(randDates(datacounter)))
                     st.setDate(1 + f, java.sql.Date.valueOf(randDates(datacounter)))//Random Dates.
                     st.addBatch()//This makes the trick for efficient "insert into Multiple Rows".
                   }
@@ -290,7 +291,7 @@ class ModelTemplate extends Model{
           mylist(tableparam).addData(colparam, randData, randDates, randTypes)
           add_data(randData)
           //Don't close the Transaction yet.
-     }catches("SQLException" -> "checkDups")//Catches duplicate keys.
+     }catches("SQLException" -> "checkDups" , "IllegalArgumentException" -> "validateDate")//Catches duplicate keys.
      "checkDups" -> "Init data" :={
           //In case of dups, Validate, close the current transaction, rollback the state of the Model, delete data and tables, and start over.
           val dbSimDuplicates = mylist(tableparam).check_for_pkDuplicates(pkparam, colparam)
@@ -299,6 +300,9 @@ class ModelTemplate extends Model{
           mylist(tableparam) = copyInit//Rollback the state of the model.
           clear_data//Delete everything.
           drop_Tables//Delete tables.
+     }
+     "validateDate" -> "checkCommit" :={
+          mylist(tableparam).deleteTable()
      }
      "checkCommit" -> "reopenCon" :={  
           if(choose(0,2)==0){
@@ -325,4 +329,6 @@ class ModelTemplate extends Model{
           //More failed cases.
      }
     
+
+
 }
