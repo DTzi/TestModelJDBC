@@ -47,7 +47,7 @@ class ModelTemplate extends Model{
           colArray = colArray :+ a//get table number.
           var createTable = con.createStatement()
           createTable.executeUpdate ("CREATE TABLE " + table
-               + "(column0 INTEGER )")//BOOLEAN
+               + "(column0 INTEGER )")
      }
 
      //Add Cols.
@@ -89,12 +89,13 @@ class ModelTemplate extends Model{
                st.setInt(1,d)//First Column.
                for(f <- 1 to colparam){
                     if(randTypes(datacounter) == 1){
-                    //Validate Dates.
-                    assert(mylist(tableparam).isValidDate(randDates(datacounter)))
+                    //assert(mylist(tableparam).isValidDate(randDates(datacounter)))//Validate Date Input.
                     st.setDate(1 + f, java.sql.Date.valueOf(randDates(datacounter)))//Random Dates.
                     st.addBatch()//This makes the trick for efficient "insert into Multiple Rows".
                   }
                   else{
+                    //assert(mylist(tableparam).isValidDate(randDates(datacounter)))//Validate Date Input.
+                    //st.setDate(1 + f, java.sql.Date.valueOf(randDates(datacounter)))//Random Dates.
                     st.setString(1 + f, randData(datacounter))//Random string for each column.
                     st.addBatch()
                   }
@@ -117,6 +118,34 @@ class ModelTemplate extends Model{
           dropCols.executeUpdate ("ALTER TABLE " + table + " DROP COLUMN " + "column" + pkcol)
      }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+     //Validate Date Input.
+     def isValid() :Boolean ={
+          var valid = false
+          var ps = con.prepareStatement("SELECT * FROM " + table)
+          var rs = ps.executeQuery()
+          var getcols = rs.getMetaData()
+          var colcount = getcols.getColumnCount()
+
+          var getData = ""
+               while(rs.next()){
+                    for(f<-2 to colcount){
+                    getData = rs.getString(f)
+                    var c = getData.charAt(0)
+                    if(c >= '0' && c <= '9'){
+                         if((mylist(tableparam).isValidDate(getData))){
+                         valid = true
+                         }
+                         else{
+                         valid = false
+                         }
+                    }
+               }
+          }
+          valid
+     }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+     
      //checkResult test functions
 
      //test if table exists.
@@ -133,7 +162,6 @@ class ModelTemplate extends Model{
      }
 
      //test if the table is populated.
-     //It is Broken.
      def data_exists() :Boolean ={
           var empty = false
           var checkdata = con.prepareStatement("SELECT * FROM " + table)
@@ -249,66 +277,88 @@ class ModelTemplate extends Model{
 
      //DB Transitions-------------------------------------------------------------------------------------------------------------------------------------------
 
+     //clear all for dups and reroll data.
      "Init data" -> "Init" :={
           choose_datatypes
           create_data
           create_dates
      }
+
      "Init" -> "Cols" :={
           //Create a table.
           val createtableModel = create_table(tableparam)
           val createtabledbSim = mylist(tableparam).createTable()
           //Deep Copy an empty Instance in case of Rolling back.
           copyInit = mylist(tableparam).clone
-          //Check if table exists.
+
+          //Check if table already exists.
           assert(table_exists(tableparam) == mylist(tableparam).returntable())
      }
+
      "Cols" -> "testCols" :={
           //Add Cols.
           add_columns(colparam)
           mylist(tableparam).addCols(colparam)
      }
+
      "testCols" -> "PK" := {
           //Test Cols.
           val testColsModel = number_of_cols()
           val testColsdbSim = mylist(tableparam).returnCols()
           assert(testColsModel == testColsdbSim)
      }
+
      "PK" -> "testPK" :={
           //Add PK.
           val addpkModel = add_pks(pkparam)
           val addpkdbSim = mylist(tableparam).addPk(pkparam)
      }
+
      "testPK" -> "addData" :={
           //Test PK.
           assert(pk_exists() == mylist(tableparam).returnPK())
      }
-     "addData" -> "checkCommit" :={
-          //Begin Transaction.
-          activeTransaction = true//Enable Transactions Active.
-          con.setAutoCommit(false)//Begin Transaction.
+
+     "addData" -> "reopenCon" :={
+          //Begin Transaction ->>>>>>
+          //con.setAutoCommit(false)//Begin Transaction.
+
           //Add some Data.
           mylist(tableparam).addData(colparam, randData, randDates, randTypes)
           add_data(randData)
-          //Don't close the Transaction yet.
-     }catches("SQLException" -> "checkDups" , "IllegalArgumentException" -> "validateDate")//Catches duplicate keys.
-     "checkDups" -> "Init data" :={
-          //In case of dups, Validate, close the current transaction, rollback the state of the Model, delete data and tables, and start over.
+
+          //check for non-dupes
           val dbSimDuplicates = mylist(tableparam).check_for_pkDuplicates(pkparam, colparam)
-          assert(dbSimDuplicates)//validate dups.
-          con.rollback()//Close the Transaction.
-          mylist(tableparam) = copyInit//Rollback the state of the model.
-          clear_data//Delete everything.
-          drop_Tables//Delete tables.
+          assert(!dbSimDuplicates) 
+
+          //check for valid input
+          isValid
+
+     }catches("SQLException" -> "checkExc", "IllegalArgumentException" -> "checkExc")
+
+     "checkExc" -> "reopenCon" :={
+          var reasonFound = false//flag for Exc.
+
+          //check for invalid input
+          if(!isValid){
+               reasonFound = true
+          }
+          //con.close() close the connection to avoid transcation error.
+          
+          //check for duplicates.
+          val dbSimDuplicates = mylist(tableparam).check_for_pkDuplicates(pkparam, colparam)
+          // no negation (dup. found) 
+          if(dbSimDuplicates){
+               reasonFound = true
+          }
+               
+     assert(reasonFound)
      }
-     "validateDate" -> "checkCommit" :={
-          mylist(tableparam).deleteTable()
-     }
+
      "checkCommit" -> "reopenCon" :={  
           if(choose(0,2)==0){
                con.commit()
                con.close()
-               //check if data Exist.
           }
           else{
                con.rollback()
@@ -316,19 +366,22 @@ class ModelTemplate extends Model{
                con.close()
           }
      }
-     "reopenCon" -> "insert Er1" :={
-          con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/test_db","postgres", "admin")//reconnect to DB due to Transaction error.
-          assert(data_exists==mylist(tableparam).returnData(colparam))//We check if both tables contain data or not, after the Transaction. 
-     }
+
+     "reopenCon" -> "Er1" :={
+          //con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/test_db","postgres", "admin")
+          //con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/test")
+          //We check if both tables contain data or not
+          assert(data_exists==mylist(tableparam).returnData(colparam))
+    }
+
      "insert Er1" -> "Er2" :={
           //Creating the same table, should throw an Exception.
           create_table(tableparam)
           mylist(tableparam).createTable()
      }catches("SQLException" -> "Err1")
      "Err1" -> "Er2" :={
-          //More failed cases.
+          //....
      }
-    
 
 
 }

@@ -63,6 +63,7 @@ import java.text.ParseException
 
   def addPk(a:Int){
     if(prkey == true){
+      //throws org.postgresql.util.PSQLException
       //println("table has already a PK")
     }
     else{
@@ -95,7 +96,7 @@ import java.text.ParseException
     return empty
   }
 
-  //Test Date Input
+  //Validate Date 
   def isValidDate(date:String) :Boolean ={
       try{
         val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
@@ -113,7 +114,7 @@ import java.text.ParseException
     for(i <- 0 to myarray.length-1){
       for(j <- 1 to a){
         if(types(datacounter) == 1){
-          isValidDate(dates(datacounter))
+          //isValidDate(dates(datacounter))
           myarray(i)(j) = dates(datacounter)
         }
         else{
@@ -127,13 +128,18 @@ import java.text.ParseException
 
   //function to find Primary Key-duplicates.
   def check_for_pkDuplicates(a:Int, b:Int) :Boolean = {
-    val mySet = HashSet.empty[Any]
+    /*val mySet = HashSet.empty[Any]
     for(i <- 0 to myarray.length-1){
       mySet += myarray(i)(a)
       if(mySet.contains(myarray(i)(a))){
         dupes = true
         clearDuplicates(b)//call it to clear the row with Duplicates.
       }
+    }
+    return dupes*/
+    if(myarray(0)(a)==myarray(1)(a)){
+      dupes = true
+      clearDuplicates(b)
     }
     return dupes
   }
