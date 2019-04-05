@@ -317,9 +317,9 @@ class ModelTemplate extends Model{
           assert(pk_exists() == mylist(tableparam).returnPK())
      }
 
-     "addData" -> "reopenCon" :={
+     "addData" -> "checkCommit" :={
           //Begin Transaction ->>>>>>
-          //con.setAutoCommit(false)//Begin Transaction.
+          con.setAutoCommit(false)//Begin Transaction.
 
           //Add some Data.
           mylist(tableparam).addData(colparam, randData, randDates, randTypes)
@@ -334,7 +334,7 @@ class ModelTemplate extends Model{
 
      }catches("SQLException" -> "checkExc", "IllegalArgumentException" -> "checkExc")
 
-     "checkExc" -> "reopenCon" :={
+     "checkExc" -> "checkCommit" :={
           var reasonFound = false//flag for Exc.
 
           //check for invalid input
@@ -353,6 +353,10 @@ class ModelTemplate extends Model{
           }
                
      assert(reasonFound)
+     //If a Query fails, we have to rollback to avoid Transaction Aborted Exc.
+     con.rollback()
+     mylist(tableparam) = copyInit//Clone
+
      }
 
      "checkCommit" -> "reopenCon" :={  
@@ -368,13 +372,14 @@ class ModelTemplate extends Model{
      }
 
      "reopenCon" -> "Er1" :={
+          //Reconnect to DB
           //con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/test_db","postgres", "admin")
-          //con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/test")
+          con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/test")
           //We check if both tables contain data or not
           assert(data_exists==mylist(tableparam).returnData(colparam))
     }
 
-     "insert Er1" -> "Er2" :={
+     "Er1" -> "Er2" :={
           //Creating the same table, should throw an Exception.
           create_table(tableparam)
           mylist(tableparam).createTable()
