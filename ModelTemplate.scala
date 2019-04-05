@@ -7,9 +7,9 @@ class ModelTemplate extends Model{
      Class.forName("org.postgresql.Driver")
      var dbConnection = null
      //Clean Installation Connection.
-     var con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/test_db","postgres", "admin")
+     //var con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/test_db","postgres", "admin")
      //Mut Connection.
-     //var con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/test")
+     var con = DriverManager.getConnection("jdbc:postgresql://localhost:5432/test")
      var databaseMetaData = con.getMetaData()//get the information needed for the test functions.
      var stat = con.createStatement()//Used by Primary Key.
      val A = List("String1", "String2", "String3",
@@ -118,33 +118,27 @@ class ModelTemplate extends Model{
           dropCols.executeUpdate ("ALTER TABLE " + table + " DROP COLUMN " + "column" + pkcol)
      }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
      //Validate Date Input.
-     def isValid() :Boolean ={
+     def validate() :Boolean ={
           var valid = false
-          var ps = con.prepareStatement("SELECT * FROM " + table)
-          var rs = ps.executeQuery()
-          var getcols = rs.getMetaData()
-          var colcount = getcols.getColumnCount()
-
-          var getData = ""
-               while(rs.next()){
-                    for(f<-2 to colcount){
-                    getData = rs.getString(f)
-                    var c = getData.charAt(0)
-                    if(c >= '0' && c <= '9'){
-                         if((mylist(tableparam).isValidDate(getData))){
+          var counter = 0//itterate over random types to get all dates.
+          for(d <- 1 to 2){//Number of Rows.
+               for(f <- 1 to colparam){
+                    if(randTypes(counter) == 1){
+                         //println("validate fun")
+                         //println(randDates(counter))
+                         if((mylist(tableparam).isValidDate(randDates(counter)))){
                          valid = true
                          }
                          else{
                          valid = false
                          }
-                    }
+                    }    
+               counter += 1
                }
           }
           valid
-     }
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+     }     
      
      //checkResult test functions
 
@@ -282,6 +276,10 @@ class ModelTemplate extends Model{
           choose_datatypes
           create_data
           create_dates
+          /*println("dates")
+          println(randDates)
+          println("types")
+          println(randTypes)*/
      }
 
      "Init" -> "Cols" :={
@@ -332,7 +330,7 @@ class ModelTemplate extends Model{
           assert(!dbSimDuplicates) 
 
           //check for valid input
-          isValid
+          validate
 
      }catches("SQLException" -> "checkExc", "IllegalArgumentException" -> "checkExc")
 
@@ -340,7 +338,8 @@ class ModelTemplate extends Model{
           var reasonFound = false//flag for Exc.
 
           //check for invalid input
-          if(!isValid){
+          if(!validate){
+               //println("!isvalid")
                reasonFound = true
           }
           //con.close() close the connection to avoid transcation error.
@@ -349,6 +348,7 @@ class ModelTemplate extends Model{
           val dbSimDuplicates = mylist(tableparam).check_for_pkDuplicates(pkparam, colparam)
           // no negation (dup. found) 
           if(dbSimDuplicates){
+               //println("dups")
                reasonFound = true
           }
                
