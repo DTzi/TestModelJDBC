@@ -5,6 +5,7 @@ Scala 2.11.12
 PostgreSQL JDBC Driver postgresql-42.2.22  
 openmodbat-3.2   
 
+# Building
 Compile: scalac -cp openmodbat-3.2.jar ModelTemplate.scala dbSim.scala
 
 Run: scala -cp /Users/Username/Desktop/modbat/postgresql-42.2.22.jar:.: openmodbat-3.2.jar --classpath=. modbat.ModelTemplate -n=100
