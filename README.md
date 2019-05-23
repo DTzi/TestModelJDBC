@@ -33,3 +33,8 @@ make coverage-html
 To reset the execution counts between test runs, run:  
 make coverage-clean
 
+# Generate dot file for Visualization
+
+ scala -cp /Users/Username/Desktop/modbat/postgresql-42.2.22.jar:.:  openmodbat-3.2.jar --classpath=. --mode=dot modbat.ModelTemplate 
+
+
