@@ -1,0 +1,27 @@
+digraph {
+ subgraph cluster_0 {
+  style=invis;
+  label="Subgraph A";
+  Initialize	-> Columns [ label = "  createTable" ];
+  Columns	-> chkCols [ label = " addCols" ];
+  chkCols	-> PKey [ label = " testCols" ];
+  PKey	-> testPK [ label = "    addPK" ];
+}
+
+subgraph cluster_1 {
+  style=invis;
+  label="Subgraph B";
+  Initialize -> Transaction [style=invis];
+  Transaction	-> chkCommit [ label = "  addData " ];
+  Transaction	-> chkException [ label = " SQLException " style = "dotted" color = "red" ];
+  Transaction	-> chkException [ label = " IllegalArgumentException " style = "dotted" color = "red" ];
+  chkException -> Initialize
+  chkException	-> chkCommit [ label = "    Validate&Duplicates " ];
+  chkCommit	-> Reconnect [ label = "    Commit or Rollback " ];
+  Reconnect	-> Testfailed [ label = "  chkData " ];
+  Reconnect -> Initialize
+  Testfailed	-> Closed [ label = "     createTable " ];
+  Testfailed	-> CheckSQLExc [ label = "  SQLException " style = "dotted" color = "red" ];    
+}
+   testPK -> Transaction [ltail="cluster_s0", lhead="cluster_s1", minlen=2];              
+}
