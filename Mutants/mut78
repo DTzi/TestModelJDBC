@@ -1,0 +1,11 @@
+--- postgres-10.5/src/bin/scripts/createdb.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m078/src/bin/scripts/createdb.c	2019-04-04 21:40:00.000000000 +0200
+@@ -198,7 +198,7 @@
+ 	appendPQExpBufferChar(&sql, ';');
+ 
+ 	/* No point in trying to use postgres db when creating postgres db. */
+-	if (maintenance_db == NULL && strcmp(dbname, "postgres") == 0)
++	if (maintenance_db == NULL && strcmp(dbname, "postgres") == 1)//mut 
+ 		maintenance_db = "template1";
+ 
+ 	conn = connectMaintenanceDatabase(maintenance_db, host, port, username,

@@ -1,0 +1,11 @@
+--- postgres-10.5/src/backend/commands/tablecmds.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m070/src/backend/commands/tablecmds.c	2019-03-06 19:19:09.000000000 +0100
+@@ -5286,7 +5286,7 @@
+ 	 * Update pg_class tuple as appropriate
+ 	 */
+ 	if (isOid)
+-		((Form_pg_class) GETSTRUCT(reltup))->relhasoids = true;
++		((Form_pg_class) GETSTRUCT(reltup))->relhasoids = false;//mut was true
+ 	else
+ 		((Form_pg_class) GETSTRUCT(reltup))->relnatts = newattnum;
+ 

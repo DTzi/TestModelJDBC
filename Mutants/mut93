@@ -1,0 +1,25 @@
+--- postgres-10.5/src/backend/utils/adt/name.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m093/src/backend/utils/adt/name.c	2019-04-07 19:06:18.000000000 +0200
+@@ -79,7 +79,7 @@
+ Datum
+ namerecv(PG_FUNCTION_ARGS)
+ {
+-	StringInfo	buf = (StringInfo) PG_GETARG_POINTER(0);
++	StringInfo	buf =  (StringInfo) PG_GETARG_POINTER(0);
+ 	Name		result;
+ 	char	   *str;
+ 	int			nbytes;
+@@ -190,7 +190,7 @@
+ int
+ namecpy(Name n1, Name n2)
+ {
+-	if (!n1 || !n2)
++	if (!n1 && !n2)//original code was !! mut
+ 		return -1;
+ 	StrNCpy(NameStr(*n1), NameStr(*n2), NAMEDATALEN);
+ 	return 0;
+@@ -322,3 +322,4 @@
+ 
+ 	PG_RETURN_POINTER(array);
+ }
++

@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/commands/tablecmds.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m026/src/backend/commands/tablecmds.c	2019-03-06 12:04:56.000000000 +0100
+@@ -13682,7 +13682,8 @@
+ 		int			num_check = attachrel_constr->num_check;
+ 		int			i;
+ 
+-		if (attachrel_constr->has_not_null)
++/* XXX: original code was : 		if (attachrel_constr->has_not_null) */
++		if  (! attachrel_constr->has_not_null)
+ 		{
+ 			int			natts = attachrel->rd_att->natts;
+ 
+@@ -13878,3 +13879,4 @@
+ 
+ 	return address;
+ }
++

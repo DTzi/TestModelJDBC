@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/commands/analyze.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m082/src/backend/commands/analyze.c	2019-04-07 15:46:41.000000000 +0200
+@@ -2778,7 +2778,8 @@
+ 		/* Do the simple null-frac and width stats */
+ 		stats->stanullfrac = (double) null_cnt / (double) samplerows;
+ 		if (is_varwidth)
+-			stats->stawidth = total_width / (double) nonnull_cnt;
++/* XXX: original code was : 			stats->stawidth = total_width / (double) nonnull_cnt; */
++			stats->stawidth = 0 ;//total_width / (double) nonnull_cnt;
+ 		else
+ 			stats->stawidth = stats->attrtype->typlen;
+ 		/* Assume all too-wide values are distinct, so it's a unique column */
+@@ -2847,3 +2848,4 @@
+ 
+ 	return da - db;
+ }
++

@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/utils/adt/bool.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m007/src/backend/utils/adt/bool.c	2019-03-05 18:42:57.000000000 +0100
+@@ -69,7 +69,8 @@
+ 			if (pg_strncasecmp(value, "no", len) == 0)
+ 			{
+ 				if (result)
+-					*result = false;
++/* XXX: original code was : 					*result = false; */
++					*result > false;
+ 				return true;
+ 			}
+ 			break;
+@@ -402,3 +403,4 @@
+ 	/* true if any non-null value is true */
+ 	PG_RETURN_BOOL(state->aggtrue > 0);
+ }
++

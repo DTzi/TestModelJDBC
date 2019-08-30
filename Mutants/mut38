@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/commands/alter.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m038/src/backend/commands/alter.c	2019-03-06 13:58:05.000000000 +0100
+@@ -686,7 +686,8 @@
+ 	 * If the object is already in the correct namespace, we don't need to do
+ 	 * anything except fire the object access hook.
+ 	 */
+-	if (oldNspOid == nspOid)
++/* XXX: original code was : 	if (oldNspOid == nspOid) */
++	if (oldNspOid  !=  nspOid)
+ 	{
+ 		InvokeObjectPostAlterHook(classId, objid, 0);
+ 		return oldNspOid;
+@@ -1021,3 +1022,4 @@
+ 
+ 	InvokeObjectPostAlterHook(classId, objectId, 0);
+ }
++

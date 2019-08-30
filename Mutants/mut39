@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/commands/alter.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m039/src/backend/commands/alter.c	2019-03-06 13:58:45.000000000 +0100
+@@ -721,7 +721,8 @@
+ 		/* User must have CREATE privilege on new namespace */
+ 		aclresult = pg_namespace_aclcheck(nspOid, GetUserId(), ACL_CREATE);
+ 		if (aclresult != ACLCHECK_OK)
+-			aclcheck_error(aclresult, ACL_KIND_NAMESPACE,
++/* XXX: original code was : 			aclcheck_error(aclresult, ACL_KIND_NAMESPACE, */
++			aclcheck_error (! aclresult, ACL_KIND_NAMESPACE,
+ 						   get_namespace_name(nspOid));
+ 	}
+ 
+@@ -1021,3 +1022,4 @@
+ 
+ 	InvokeObjectPostAlterHook(classId, objectId, 0);
+ }
++

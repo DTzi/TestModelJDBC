@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/utils/adt/bool.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m004/src/backend/utils/adt/bool.c	2019-03-05 18:19:09.000000000 +0100
+@@ -88,7 +88,8 @@
+ 					*result = false;
+ 				return true;
+ 			}
+-			break;
++/* XXX: original code was : 			break; */
++			{;}
+ 		case '1':
+ 			if (len == 1)
+ 			{
+@@ -402,3 +403,4 @@
+ 	/* true if any non-null value is true */
+ 	PG_RETURN_BOOL(state->aggtrue > 0);
+ }
++

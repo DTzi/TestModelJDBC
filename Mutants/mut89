@@ -1,0 +1,19 @@
+--- postgres-10.5/src/backend/utils/resowner/resowner.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m089/src/backend/utils/resowner/resowner.c	2019-04-07 17:30:02.000000000 +0200
+@@ -622,9 +622,10 @@
+ 		/* Ditto for catcache lists */
+ 		while (ResourceArrayGetAny(&(owner->catlistrefarr), &foundres))
+ 		{
++/* XXX: original code was : 			CatCList   *res = (CatCList *) DatumGetPointer(foundres); */
+ 			CatCList   *res = (CatCList *) DatumGetPointer(foundres);
+ 
+-			if (isCommit)
++			if (!isCommit)//added !
+ 				PrintCatCacheListLeakWarning(res);
+ 			ReleaseCatCacheList(res);
+ 		}
+@@ -1267,3 +1268,4 @@
+ 	elog(WARNING, "dynamic shared memory leak: segment %u still referenced",
+ 		 dsm_segment_handle(seg));
+ }
++

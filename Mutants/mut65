@@ -1,0 +1,11 @@
+--- postgres-10.5/src/backend/commands/tablecmds.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m065/src/backend/commands/tablecmds.c	2019-03-06 19:14:45.000000000 +0100
+@@ -5129,7 +5129,7 @@
+ 	ObjectAddress address;
+ 
+ 	/* At top level, permission check was done in ATPrepCmd, else do it */
+-	if (recursing)
++	if (!recursing)//mut added !
+ 		ATSimplePermissions(rel, ATT_TABLE | ATT_FOREIGN_TABLE);
+ 
+ 	if (rel->rd_rel->relispartition && !recursing)

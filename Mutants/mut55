@@ -1,0 +1,11 @@
+--- postgres-10.5/src/backend/utils/adt/name.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m055/src/backend/utils/adt/name.c	2019-03-06 18:28:12.000000000 +0100
+@@ -317,7 +317,7 @@
+ 	array = construct_array(names, i,
+ 							NAMEOID,
+ 							NAMEDATALEN,	/* sizeof(Name) */
+-							false,	/* Name is not by-val */
++							true,	/* Name is not by-val */ //mut false to true
+ 							'c');	/* alignment of Name */
+ 
+ 	PG_RETURN_POINTER(array);

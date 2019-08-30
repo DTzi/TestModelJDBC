@@ -1,0 +1,26 @@
+--- postgres-10.5/src/backend/utils/adt/date.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m012/src/backend/utils/adt/date.c	2019-03-05 19:46:01.000000000 +0100
+@@ -529,7 +529,7 @@
+ 	if (DATE_NOT_FINITE(dateVal))
+ 		PG_RETURN_DATEADT(dateVal); /* can't change infinity */
+ 
+-	result = dateVal + days;
++	result = dateVal - days;//mut
+ 
+ 	/* Check for integer overflow and out-of-allowed-range */
+ 	if ((days >= 0 ? (result < dateVal) : (result > dateVal)) ||
+@@ -786,7 +786,8 @@
+ }
+ 
+ Datum
+-date_lt_timestamptz(PG_FUNCTION_ARGS)
++/* XXX: original code was : date_lt_timestamptz(PG_FUNCTION_ARGS) */
++date_lt_timestamptz (PG_FUNCTION_ARGS)
+ {
+ 	DateADT		dateVal = PG_GETARG_DATEADT(0);
+ 	TimestampTz dt2 = PG_GETARG_TIMESTAMPTZ(1);
+@@ -2734,3 +2735,4 @@
+ 
+ 	PG_RETURN_TIMETZADT_P(result);
+ }
++

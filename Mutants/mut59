@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/utils/adt/numeric.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m059/src/backend/utils/adt/numeric.c	2019-03-06 18:32:37.000000000 +0100
+@@ -9063,7 +9063,8 @@
+ 	pos_var.buf = pos_var.digits = digitbuf_alloc(accum->ndigits);
+ 	neg_var.buf = neg_var.digits = digitbuf_alloc(accum->ndigits);
+ 
+-	for (i = 0; i < accum->ndigits; i++)
++/* XXX: original code was : 	for (i = 0; i < accum->ndigits; i++) */
++	for (i = 0; i != accum->ndigits; i++)
+ 	{
+ 		Assert(accum->pos_digits[i] < NBASE);
+ 		pos_var.digits[i] = (int16) accum->pos_digits[i];
+@@ -9114,3 +9115,4 @@
+ 
+ 	free_var(&tmp_var);
+ }
++

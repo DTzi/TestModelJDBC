@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/utils/adt/array_typanalyze.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m073/src/backend/utils/adt/array_typanalyze.c	2019-04-04 21:16:47.000000000 +0200
+@@ -558,7 +558,8 @@
+ 
+ 			MemoryContextSwitchTo(old_context);
+ 
+-			stats->stakind[slot_idx] = STATISTIC_KIND_MCELEM;
++/* XXX: original code was : 			stats->stakind[slot_idx] = STATISTIC_KIND_MCELEM; */
++			stats->stakind[slot_idx] = ! STATISTIC_KIND_MCELEM;
+ 			stats->staop[slot_idx] = extra_data->eq_opr;
+ 			stats->stanumbers[slot_idx] = mcelem_freqs;
+ 			/* See above comment about extra stanumber entries */
+@@ -785,3 +786,4 @@
+ 	else
+ 		return 1;
+ }
++

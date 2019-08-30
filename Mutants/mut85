@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/commands/analyze.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m085/src/backend/commands/analyze.c	2019-04-07 15:48:59.000000000 +0200
+@@ -1344,7 +1344,8 @@
+ 		childrel = heap_open(childOID, NoLock);
+ 
+ 		/* Ignore if temp table of another backend */
+-		if (RELATION_IS_OTHER_TEMP(childrel))
++/* XXX: original code was : 		if (RELATION_IS_OTHER_TEMP(childrel)) */
++		if ( ! RELATION_IS_OTHER_TEMP(childrel))
+ 		{
+ 			/* ... but release the lock on it */
+ 			Assert(childrel != onerel);
+@@ -2847,3 +2848,4 @@
+ 
+ 	return da - db;
+ }
++

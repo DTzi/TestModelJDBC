@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/utils/adt/varchar.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m009/src/backend/utils/adt/varchar.c	2019-03-05 18:46:52.000000000 +0100
+@@ -49,7 +49,8 @@
+ 		ereport(ERROR,
+ 				(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+ 				 errmsg("length for type %s must be at least 1", typename)));
+-	if (*tl > MaxAttrSize)
++/* XXX: original code was : 	if (*tl > MaxAttrSize) */
++	if ( ~ *tl > MaxAttrSize)
+ 		ereport(ERROR,
+ 				(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+ 				 errmsg("length for type %s cannot exceed %d",
+@@ -1073,3 +1074,4 @@
+ 
+ 	PG_RETURN_VOID();
+ }
++

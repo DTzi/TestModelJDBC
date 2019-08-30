@@ -1,0 +1,10 @@
+--- postgres-10.5/src/backend/commands/tablecmds.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m063/src/backend/commands/tablecmds.c	2019-03-06 19:12:23.000000000 +0100
+@@ -5096,7 +5096,7 @@
+ 	if (rel->rd_rel->relkind == RELKIND_COMPOSITE_TYPE)
+ 		ATTypedTableRecursion(wqueue, rel, cmd, lockmode);
+ 
+-	if (recurse && !is_view)
++	if (recurse && is_view)//mut removed !
+ 		cmd->subtype = AT_AddColumnRecurse;
+ }

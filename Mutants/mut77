@@ -1,0 +1,11 @@
+--- postgres-10.5/src/bin/scripts/createdb.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m077/src/bin/scripts/createdb.c	2019-04-04 21:39:10.000000000 +0200
+@@ -167,7 +167,7 @@
+ 		}
+ 	}
+ 
+-	if (dbname == NULL)
++	if (dbname == !NULL)//muta
+ 	{
+ 		if (getenv("PGDATABASE"))
+ 			dbname = getenv("PGDATABASE");

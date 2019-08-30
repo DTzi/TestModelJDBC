@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/commands/tablecmds.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m024/src/backend/commands/tablecmds.c	2019-03-06 12:03:12.000000000 +0100
+@@ -3570,7 +3570,8 @@
+ 			ATSimplePermissions(rel, ATT_TABLE);
+ 			/* This command never recurses */
+ 			/* No command-specific prep needed */
+-			pass = AT_PASS_ADD_CONSTR;
++/* XXX: original code was : 			pass = AT_PASS_ADD_CONSTR; */
++			pass < AT_PASS_ADD_CONSTR;
+ 			break;
+ 		case AT_DropConstraint: /* DROP CONSTRAINT */
+ 			ATSimplePermissions(rel, ATT_TABLE | ATT_FOREIGN_TABLE);
+@@ -13878,3 +13879,4 @@
+ 
+ 	return address;
+ }
++

@@ -1,0 +1,19 @@
+--- postgres-10.5/src/backend/utils/adt/char.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m006/src/backend/utils/adt/char.c	2019-03-05 18:37:24.000000000 +0100
+@@ -50,8 +50,9 @@
+ 	char		ch = PG_GETARG_CHAR(0);
+ 	char	   *result = (char *) palloc(2);
+ 
+-	result[0] = ch;
+-	result[1] = '\0';
++	result[0] = '\0';//mut reversed
++	result[1] = ch;
++/* XXX: original code was : 	PG_RETURN_CSTRING(result); */
+ 	PG_RETURN_CSTRING(result);
+ }
+ 
+@@ -211,3 +212,4 @@
+ 
+ 	PG_RETURN_TEXT_P(result);
+ }
++

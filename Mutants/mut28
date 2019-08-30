@@ -1,0 +1,28 @@
+--- postgres-10.5/src/backend/commands/tablecmds.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m028/src/backend/commands/tablecmds.c	2019-03-06 12:28:39.000000000 +0100
+@@ -3795,7 +3795,8 @@
+ 	}
+ 
+ 	/* Check to see if a toast table must be added. */
+-	foreach(ltab, *wqueue)
++/* XXX: original code was : 	foreach(ltab, *wqueue) */
++	foreach(ltab,  *wqueue)
+ 	{
+ 		AlteredTableInfo *tab = (AlteredTableInfo *) lfirst(ltab);
+ 
+@@ -3803,8 +3804,8 @@
+ 		 * If the table is source table of ATTACH PARTITION command, we did
+ 		 * not modify anything about it that will change its toasting
+ 		 * requirement, so no need to check.
+-		 */
+-		if (((tab->relkind == RELKIND_RELATION ||
++		 */	//mut !=
++		if (((tab->relkind != RELKIND_RELATION ||
+ 			  tab->relkind == RELKIND_PARTITIONED_TABLE) &&
+ 			 tab->partition_constraint == NULL) ||
+ 			tab->relkind == RELKIND_MATVIEW)
+@@ -13878,3 +13879,4 @@
+ 
+ 	return address;
+ }
++

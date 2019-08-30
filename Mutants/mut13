@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/utils/adt/date.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m013/src/backend/utils/adt/date.c	2019-03-05 19:28:28.000000000 +0100
+@@ -1010,7 +1010,8 @@
+ 
+ 	dt2 = date2timestamptz(dateVal);
+ 
+-	PG_RETURN_INT32(timestamptz_cmp_internal(dt1, dt2));
++/* XXX: original code was : 	PG_RETURN_INT32(timestamptz_cmp_internal(dt1, dt2)); */
++	PG_RETURN_INT32(timestamptz_cmp_internal(dt1, 0 *  dt2));
+ }
+ 
+ 
+@@ -2734,3 +2735,4 @@
+ 
+ 	PG_RETURN_TIMETZADT_P(result);
+ }
++

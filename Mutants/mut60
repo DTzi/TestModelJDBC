@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/utils/adt/numeric.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m060/src/backend/utils/adt/numeric.c	2019-03-06 18:33:09.000000000 +0100
+@@ -4274,7 +4274,8 @@
+ 		PG_RETURN_POINTER(state1);
+ 
+ 	/* manually copy all fields from state2 to state1 */
+-	if (state1 == NULL)
++/* XXX: original code was : 	if (state1 == NULL) */
++	if ( 0 && state1 == NULL)
+ 	{
+ 		old_context = MemoryContextSwitchTo(agg_context);
+ 
+@@ -9114,3 +9115,4 @@
+ 
+ 	free_var(&tmp_var);
+ }
++

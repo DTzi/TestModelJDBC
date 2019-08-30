@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/catalog/dropcmds.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m034/src/backend/catalog/dropcmds.c	2019-03-06 13:36:01.000000000 +0100
+@@ -179,7 +179,8 @@
+ {
+ 	RangeVar   *rel;
+ 
+-	rel = makeRangeVarFromNameList(object);
++/* XXX: original code was : 	rel = makeRangeVarFromNameList(object); */
++	rel = makeRangeVarFromNameList (! object);
+ 
+ 	if (rel->schemaname != NULL &&
+ 		!OidIsValid(LookupNamespaceNoError(rel->schemaname)))
+@@ -464,3 +465,4 @@
+ 	else
+ 		ereport(NOTICE, (errmsg(msg, name, args)));
+ }
++

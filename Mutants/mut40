@@ -1,0 +1,21 @@
+--- postgres-10.5/src/backend/commands/alter.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m040/src/backend/commands/alter.c	2019-03-06 14:14:13.000000000 +0100
+@@ -525,10 +525,11 @@
+ 		default:
+ 			elog(ERROR, "unrecognized AlterObjectSchemaStmt type: %d",
+ 				 (int) stmt->objectType);
+-			return InvalidObjectAddress;	/* keep compiler happy */
++/* XXX: original code was : 			return InvalidObjectAddress;	/* keep compiler happy */ 
++			return InvalidObjectAddress; //InvalidObjectAddress;	/* keep compiler happy */
+ 	}
+ 
+-	if (oldSchemaAddr)
++	if (!oldSchemaAddr)//mut
+ 		ObjectAddressSet(*oldSchemaAddr, NamespaceRelationId, oldNspOid);
+ 
+ 	return address;
+@@ -1021,3 +1022,4 @@
+ 
+ 	InvokeObjectPostAlterHook(classId, objectId, 0);
+ }
++

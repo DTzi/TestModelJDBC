@@ -1,0 +1,15 @@
+--- postgres-10.5/src/backend/utils/adt/date.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m002/src/backend/utils/adt/date.c	2019-07-15 11:59:31.000000000 +0200
+@@ -130,9 +130,10 @@
+ 
+ 	dterr = ParseDateTime(str, workbuf, sizeof(workbuf),
+ 						  field, ftype, MAXDATEFIELDS, &nf);
+-	if (dterr == 0)
++						  /* XXX: original code was : 	if (dterr == 0; */
++	if (dterr != 0)//mut != == instead of == !=
+ 		dterr = DecodeDateTime(field, ftype, nf, &dtype, tm, &fsec, &tzp);
+-	if (dterr != 0)
++	if (dterr == 0)
+ 		DateTimeParseError(dterr, str, "date");
+ 
+ 	switch (dtype)

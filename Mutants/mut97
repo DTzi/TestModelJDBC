@@ -1,0 +1,28 @@
+--- postgres-10.5/src/backend/nodes/makefuncs.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m097/src/backend/nodes/makefuncs.c	2019-04-07 21:17:03.000000000 +0200
+@@ -185,16 +185,17 @@
+ 								 InvalidOid,
+ 								 varlevelsup);
+ 			}
+-			else if (allowScalar)
++/* XXX: original code was : 			else if (allowScalar) */
++			/*else if (allowScalar)
+ 			{
+-				/* func returns scalar; just return its output as-is */
++				/* func returns scalar; just return its output as-is 
+ 				result = makeVar(varno,
+ 								 1,
+ 								 toid,
+ 								 -1,
+ 								 exprCollation(fexpr),
+ 								 varlevelsup);
+-			}
++			}*/
+ 			else
+ 			{
+ 				/* func returns scalar, but we want a composite result */
+@@ -611,3 +612,4 @@
+ 	n->location = location;
+ 	return n;
+ }
++

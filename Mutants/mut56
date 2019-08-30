@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/utils/adt/numeric.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m056/src/backend/utils/adt/numeric.c	2019-03-06 18:29:58.000000000 +0100
+@@ -698,7 +698,8 @@
+ 	 * DEC_DIGITS + 2 decimal digits that we potentially need a third
+ 	 * NumericDigit.
+ 	 */
+-	numeric_digits = (precision + 2 * (DEC_DIGITS - 1)) / DEC_DIGITS;
++/* XXX: original code was : 	numeric_digits = (precision + 2 * (DEC_DIGITS - 1)) / DEC_DIGITS; */
++	numeric_digits = (precision + 2 * (DEC_DIGITS - 1)) * DEC_DIGITS;
+ 
+ 	/*
+ 	 * In most cases, the size of a numeric will be smaller than the value
+@@ -9114,3 +9115,4 @@
+ 
+ 	free_var(&tmp_var);
+ }
++

@@ -1,0 +1,11 @@
+--- postgres-10.5/src/backend/utils/adt/name.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m052/src/backend/utils/adt/name.c	2019-03-06 18:25:40.000000000 +0100
+@@ -52,7 +52,7 @@
+ 	len = strlen(s);
+ 
+ 	/* Truncate oversize input */
+-	if (len >= NAMEDATALEN)
++	if (len <= NAMEDATALEN)//mut >=
+ 		len = pg_mbcliplen(s, len, NAMEDATALEN - 1);
+ 
+ 	/* We use palloc0 here to ensure result is zero-padded */

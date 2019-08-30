@@ -1,0 +1,11 @@
+--- postgres-10.5/src/backend/utils/adt/name.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m094/src/backend/utils/adt/name.c	2019-04-07 18:53:15.000000000 +0200
+@@ -215,7 +215,7 @@
+ int
+ namestrcpy(Name name, const char *str)
+ {
+-	if (!name || !str)
++	if (!name && !str)//original was !! mut
+ 		return -1;
+ 	StrNCpy(NameStr(*name), str, NAMEDATALEN);
+ 	return 0;

@@ -1,0 +1,24 @@
+--- postgres-10.5/src/backend/utils/adt/array_typanalyze.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m071/src/backend/utils/adt/array_typanalyze.c	2019-04-04 21:26:57.000000000 +0200
+@@ -239,6 +239,7 @@
+ 	HASHCTL		count_hash_ctl;
+ 	DECountItem *count_item;
+ 
++/* XXX: original code was : 	extra_data = (ArrayAnalyzeExtraData *) stats->extra_data; */
+ 	extra_data = (ArrayAnalyzeExtraData *) stats->extra_data;
+ 
+ 	/*
+@@ -298,7 +299,7 @@
+ 							HASH_ELEM | HASH_BLOBS | HASH_CONTEXT);
+ 
+ 	/* Initialize counters. */
+-	b_current = 1;
++	b_current = 0;//muta
+ 	element_no = 0;
+ 
+ 	/* Loop over the arrays. */
+@@ -785,3 +786,4 @@
+ 	else
+ 		return 1;
+ }
++

@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/nodes/makefuncs.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m096/src/backend/nodes/makefuncs.c	2019-04-07 20:57:01.000000000 +0200
+@@ -570,7 +570,8 @@
+ 	res->defaction = defaction;
+ 	res->location = location;
+ 
+-	return res;
++/* XXX: original code was : 	return res; */
++	return NULL; //res;
+ }
+ 
+ /*
+@@ -611,3 +612,4 @@
+ 	n->location = location;
+ 	return n;
+ }
++

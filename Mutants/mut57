@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/utils/adt/numeric.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m057/src/backend/utils/adt/numeric.c	2019-03-06 18:30:54.000000000 +0100
+@@ -6793,7 +6793,8 @@
+ 	 * i1+i2+2 of the accumulator array, so we need only consider digits of
+ 	 * var1 for which i1 <= res_ndigits - 3.
+ 	 */
+-	for (i1 = Min(var1ndigits - 1, res_ndigits - 3); i1 >= 0; i1--)
++/* XXX: original code was : 	for (i1 = Min(var1ndigits - 1, res_ndigits - 3); i1 >= 0; i1--) */
++	for (i1 = Min(var1ndigits+ 0, res_ndigits - 3); i1 >= 0; i1--)
+ 	{
+ 		int			var1digit = var1digits[i1];
+ 
+@@ -9114,3 +9115,4 @@
+ 
+ 	free_var(&tmp_var);
+ }
++

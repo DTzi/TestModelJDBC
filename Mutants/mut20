@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/utils/adt/int.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m020/src/backend/utils/adt/int.c	2019-03-05 20:19:50.000000000 +0100
+@@ -350,7 +350,8 @@
+ Datum
+ bool_int4(PG_FUNCTION_ARGS)
+ {
+-	if (PG_GETARG_BOOL(0) == false)
++/* XXX: original code was : 	if (PG_GETARG_BOOL(0) == false) */
++	if ( 1 || PG_GETARG_BOOL(0) == false)
+ 		PG_RETURN_INT32(0);
+ 	else
+ 		PG_RETURN_INT32(1);
+@@ -1395,3 +1396,4 @@
+ 		/* do when there is no more left */
+ 		SRF_RETURN_DONE(funcctx);
+ }
++

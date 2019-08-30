@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/utils/adt/int.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m018/src/backend/utils/adt/int.c	2019-03-05 20:22:48.000000000 +0100
+@@ -1190,7 +1190,8 @@
+ Datum
+ int4smaller(PG_FUNCTION_ARGS)
+ {
+-	int32		arg1 = PG_GETARG_INT32(0);
++/* XXX: original code was : 	int32		arg1 = PG_GETARG_INT32(0); */
++	int32		arg1 = PG_GETARG_INT32 (2);
+ 	int32		arg2 = PG_GETARG_INT32(1);
+ 
+ 	PG_RETURN_INT32((arg1 < arg2) ? arg1 : arg2);
+@@ -1395,3 +1396,4 @@
+ 		/* do when there is no more left */
+ 		SRF_RETURN_DONE(funcctx);
+ }
++

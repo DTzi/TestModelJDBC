@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/utils/adt/date.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m015/src/backend/utils/adt/date.c	2019-03-05 19:32:31.000000000 +0100
+@@ -629,7 +629,8 @@
+ 		tm->tm_sec = 0;
+ 		tz = DetermineTimeZoneOffset(tm, session_timezone);
+ 
+-		result = dateVal * USECS_PER_DAY + tz * USECS_PER_SEC;
++/* XXX: original code was : 		result = dateVal * USECS_PER_DAY + tz * USECS_PER_SEC; */
++		result = 0 ;//dateVal * USECS_PER_DAY + tz * USECS_PER_SEC;
+ 
+ 		/*
+ 		 * Since it is possible to go beyond allowed timestamptz range because
+@@ -2734,3 +2735,4 @@
+ 
+ 	PG_RETURN_TIMETZADT_P(result);
+ }
++

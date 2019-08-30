@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/catalog/dropcmds.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m033/src/backend/catalog/dropcmds.c	2019-03-06 13:35:32.000000000 +0100
+@@ -397,7 +397,8 @@
+ 			}
+ 			break;
+ 		case OBJECT_POLICY:
+-			if (!owningrel_does_not_exist_skipping(castNode(List, object), &msg, &name))
++/* XXX: original code was : 			if (!owningrel_does_not_exist_skipping(castNode(List, object), &msg, &name)) */
++			if ( ~ !owningrel_does_not_exist_skipping(castNode(List, object), &msg, &name))
+ 			{
+ 				msg = gettext_noop("policy \"%s\" for relation \"%s\" does not exist, skipping");
+ 				name = strVal(llast(castNode(List, object)));
+@@ -464,3 +465,4 @@
+ 	else
+ 		ereport(NOTICE, (errmsg(msg, name, args)));
+ }
++

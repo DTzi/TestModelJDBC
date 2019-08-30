@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/utils/adt/numeric.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m058/src/backend/utils/adt/numeric.c	2019-03-06 18:31:50.000000000 +0100
+@@ -7488,7 +7488,8 @@
+ 		firstdigit1 = var1->digits[i];
+ 		if (firstdigit1 != 0)
+ 		{
+-			weight1 = var1->weight - i;
++/* XXX: original code was : 			weight1 = var1->weight - i; */
++			weight1 = var1->weight * i;
+ 			break;
+ 		}
+ 	}
+@@ -9114,3 +9115,4 @@
+ 
+ 	free_var(&tmp_var);
+ }
++

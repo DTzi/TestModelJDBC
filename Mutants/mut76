@@ -1,0 +1,11 @@
+--- postgres-10.5/src/bin/scripts/createdb.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m076/src/bin/scripts/createdb.c	2019-04-04 21:38:35.000000000 +0200
+@@ -139,7 +139,7 @@
+ 			exit(1);
+ 	}
+ 
+-	if (locale)
++	if (!locale)//muta
+ 	{
+ 		if (lc_ctype)
+ 		{

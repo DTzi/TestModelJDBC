@@ -1,0 +1,40 @@
+--- postgres-10.5/src/backend/utils/adt/date.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m011/src/backend/utils/adt/date.c	2019-03-05 19:44:55.000000000 +0100
+@@ -2358,7 +2358,8 @@
+ 
+ 	/*
+ 	 * At this point neither ts1 nor ts2 is null, so we can consider three
+-	 * cases: ts1 > ts2, ts1 < ts2, ts1 = ts2
++/* XXX: original code was : 	 * cases: ts1 > ts2, ts1 < ts2, ts1 = ts2 
++	 % cases: ts1 > ts2, ts1 < ts2, ts1 = ts2
+ 	 */
+ 	if (TIMETZ_GT(ts1, ts2))
+ 	{
+@@ -2395,16 +2396,16 @@
+ 		 */
+ 		PG_RETURN_BOOL(false);
+ 	}
+-	else
+-	{
++	//else
++	//{
+ 		/*
+ 		 * For ts1 = ts2 the spec says te1 <> te2 OR te1 = te2, which is a
+ 		 * rather silly way of saying "true if both are nonnull, else null".
+ 		 */
+-		if (te1IsNull || te2IsNull)
+-			PG_RETURN_NULL();
+-		PG_RETURN_BOOL(true);
+-	}
++		//if (te1IsNull || te2IsNull)
++		//	PG_RETURN_NULL();
++		//PG_RETURN_BOOL(true);
++	//}
+ 
+ #undef TIMETZ_GT
+ #undef TIMETZ_LT
+@@ -2734,3 +2735,4 @@
+ 
+ 	PG_RETURN_TIMETZADT_P(result);
+ }
++

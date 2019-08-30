@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/commands/analyze.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m083/src/backend/commands/analyze.c	2019-04-07 15:47:26.000000000 +0200
+@@ -398,7 +398,8 @@
+ 						(errcode(ERRCODE_UNDEFINED_COLUMN),
+ 						 errmsg("column \"%s\" of relation \"%s\" does not exist",
+ 								col, RelationGetRelationName(onerel))));
+-			if (bms_is_member(i, unique_cols))
++/* XXX: original code was : 			if (bms_is_member(i, unique_cols)) */
++			if ( ! bms_is_member(i, unique_cols))
+ 				ereport(ERROR,
+ 						(errcode(ERRCODE_DUPLICATE_COLUMN),
+ 						 errmsg("column \"%s\" of relation \"%s\" appears more than once",
+@@ -2847,3 +2848,4 @@
+ 
+ 	return da - db;
+ }
++

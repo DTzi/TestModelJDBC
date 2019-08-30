@@ -1,0 +1,26 @@
+--- postgres-10.5/src/backend/commands/tablecmds.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m025/src/backend/commands/tablecmds.c	2019-03-06 12:27:30.000000000 +0100
+@@ -7477,7 +7477,7 @@
+ 	while (HeapTupleIsValid(contuple = systable_getnext(scan)))
+ 	{
+ 		currcon = (Form_pg_constraint) GETSTRUCT(contuple);
+-		if (strcmp(NameStr(currcon->conname), cmdcon->conname) == 0)
++		if (strcmp(NameStr(currcon->conname), cmdcon->conname) != 0)//mut
+ 		{
+ 			found = true;
+ 			break;
+@@ -8287,7 +8287,8 @@
+ 
+ static void
+ CreateFKCheckTrigger(Oid myRelOid, Oid refRelOid, Constraint *fkconstraint,
+-					 Oid constraintOid, Oid indexOid, bool on_insert)
++/* XXX: original code was : 					 Oid constraintOid, Oid indexOid, bool on_insert) */
++					 Oid constraintOid,  Oid indexOid, bool on_insert)
+ {
+ 	CreateTrigStmt *fk_trigger;
+ 
+@@ -13878,3 +13879,4 @@
+ 
+ 	return address;
+ }
++

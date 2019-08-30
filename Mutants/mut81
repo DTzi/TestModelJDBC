@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/commands/analyze.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m081/src/backend/commands/analyze.c	2019-04-07 15:45:46.000000000 +0200
+@@ -1634,7 +1634,8 @@
+ 			ReleaseSysCache(oldtup);
+ 			CatalogTupleUpdate(sd, &stup->t_self, stup);
+ 		}
+-		else
++/* XXX: original code was : 		else */
++		// else
+ 		{
+ 			/* No, insert new tuple */
+ 			stup = heap_form_tuple(RelationGetDescr(sd), values, nulls);
+@@ -2847,3 +2848,4 @@
+ 
+ 	return da - db;
+ }
++

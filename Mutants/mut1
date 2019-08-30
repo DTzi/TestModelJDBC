@@ -1,0 +1,12 @@
+--- postgres-10.5/src/bin/psql/variables.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m001/src/bin/psql/variables.c	2019-08-30 17:03:00.000000000 +0200
+@@ -114,8 +114,7 @@
+ 		value = "";
+ 
+ 	len = strlen(value);
+-
+-	if (len > 0 && pg_strncasecmp(value, "true", len) == 0)
++	if (len < 0 && pg_strncasecmp(value, "true", len) == 0)
+ 		*result = true;
+ 	else if (len > 0 && pg_strncasecmp(value, "false", len) == 0)
+ 		*result = false;

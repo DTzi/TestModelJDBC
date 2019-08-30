@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/commands/analyze.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m084/src/backend/commands/analyze.c	2019-04-07 15:48:11.000000000 +0200
+@@ -2818,7 +2818,8 @@
+ 	CompareScalarsContext *cxt = (CompareScalarsContext *) arg;
+ 	int			compare;
+ 
+-	compare = ApplySortComparator(da, false, db, false, cxt->ssup);
++/* XXX: original code was : 	compare = ApplySortComparator(da, false, db, false, cxt->ssup); */
++	compare = ! ApplySortComparator(da, false, db, false, cxt->ssup);
+ 	if (compare != 0)
+ 		return compare;
+ 
+@@ -2847,3 +2848,4 @@
+ 
+ 	return da - db;
+ }
++

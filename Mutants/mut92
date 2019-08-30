@@ -1,0 +1,26 @@
+--- postgres-10.5/src/backend/utils/adt/name.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m092/src/backend/utils/adt/name.c	2019-04-07 19:04:57.000000000 +0200
+@@ -237,7 +237,7 @@
+ 	{
+ 		*p = *q;
+ 		if (!*q)
+-			break;
++			return 0;//original code was break
+ 	}
+ 	return 0;
+ }
+@@ -251,7 +251,8 @@
+ 	if (!name)
+ 		return -1;				/* NULL < anything */
+ 	if (!str)
+-		return 1;				/* NULL < anything */
++/* XXX: original code was : 		return 1;				/* NULL < anything */ 
++		return 1; //1;				/* NULL < anything */
+ 	return strncmp(NameStr(*name), str, NAMEDATALEN);
+ }
+ 
+@@ -322,3 +323,4 @@
+ 
+ 	PG_RETURN_POINTER(array);
+ }
++

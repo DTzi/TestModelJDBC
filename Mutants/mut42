@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/commands/variable.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m042/src/backend/commands/variable.c	2019-03-06 14:24:08.000000000 +0100
+@@ -551,7 +551,8 @@
+ 
+ 	if (newXactIsoLevel != XactIsoLevel && IsTransactionState())
+ 	{
+-		if (FirstSnapshotSet)
++/* XXX: original code was : 		if (FirstSnapshotSet) */
++		if ( ! FirstSnapshotSet)
+ 		{
+ 			GUC_check_errcode(ERRCODE_ACTIVE_SQL_TRANSACTION);
+ 			GUC_check_errmsg("SET TRANSACTION ISOLATION LEVEL must be called before any query");
+@@ -950,3 +951,4 @@
+ 	/* Otherwise we can just use the GUC string */
+ 	return role_string ? role_string : "none";
+ }
++

@@ -1,0 +1,11 @@
+--- postgres-10.5/src/backend/utils/error/assert.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m051/src/backend/utils/error/assert.c	2019-03-06 18:23:34.000000000 +0100
+@@ -28,7 +28,7 @@
+ 					 const char *fileName,
+ 					 int lineNumber)
+ {
+-	if (!PointerIsValid(conditionName)
++	if (PointerIsValid(conditionName)//mut
+ 		|| !PointerIsValid(fileName)
+ 		|| !PointerIsValid(errorType))
+ 		write_stderr("TRAP: ExceptionalCondition: bad arguments\n");

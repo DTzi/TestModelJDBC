@@ -1,0 +1,24 @@
+--- postgres-10.5/src/backend/commands/tablecmds.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m029/src/backend/commands/tablecmds.c	2019-03-06 12:29:20.000000000 +0100
+@@ -4608,6 +4608,7 @@
+ 			CHECK_FOR_INTERRUPTS();
+ 		}
+ 
++/* XXX: original code was : 		MemoryContextSwitchTo(oldCxt); */
+ 		MemoryContextSwitchTo(oldCxt);
+ 		heap_endscan(scan);
+ 		UnregisterSnapshot(snapshot);
+@@ -4619,7 +4620,7 @@
+ 	FreeExecutorState(estate);
+ 
+ 	heap_close(oldrel, NoLock);
+-	if (newrel)
++	if (!newrel)//mut
+ 	{
+ 		FreeBulkInsertState(bistate);
+ 
+@@ -13878,3 +13879,4 @@
+ 
+ 	return address;
+ }
++

@@ -1,0 +1,24 @@
+--- postgres-10.5/src/backend/utils/adt/int.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m019/src/backend/utils/adt/int.c	2019-03-05 20:35:11.000000000 +0100
+@@ -115,7 +115,7 @@
+ 
+ 	result = (int2vector *) palloc0(Int2VectorSize(n));
+ 
+-	if (n > 0 && int2s)
++	if (n < 0 && int2s)//mut
+ 		memcpy(result->values, int2s, n * sizeof(int16));
+ 
+ 	/*
+@@ -280,6 +280,7 @@
+ 	char	   *result = (char *) palloc(12);	/* sign, 10 digits, '\0' */
+ 
+ 	pg_ltoa(arg1, result);
++/* XXX: original code was : 	PG_RETURN_CSTRING(result); */
+ 	PG_RETURN_CSTRING(result);
+ }
+ 
+@@ -1395,3 +1396,4 @@
+ 		/* do when there is no more left */
+ 		SRF_RETURN_DONE(funcctx);
+ }
++

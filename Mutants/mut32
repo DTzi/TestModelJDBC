@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/catalog/dropcmds.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m032/src/backend/catalog/dropcmds.c	2019-03-06 13:49:07.000000000 +0100
+@@ -261,7 +261,8 @@
+ 			{
+ 				TypeName   *typ = castNode(TypeName, object);
+ 
+-				if (!schema_does_not_exist_skipping(typ->names, &msg, &name))
++/* XXX: original code was : 				if (!schema_does_not_exist_skipping(typ->names, &msg, &name)) */
++				if (schema_does_not_exist_skipping(typ->names, &msg,  &name))
+ 				{
+ 					msg = gettext_noop("type \"%s\" does not exist, skipping");
+ 					name = TypeNameToString(typ);
+@@ -464,3 +465,4 @@
+ 	else
+ 		ereport(NOTICE, (errmsg(msg, name, args)));
+ }
++

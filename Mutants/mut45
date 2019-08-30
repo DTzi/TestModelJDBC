@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/commands/variable.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m045/src/backend/commands/variable.c	2019-03-06 14:25:46.000000000 +0100
+@@ -923,7 +923,8 @@
+ 	myextra->is_superuser = is_superuser;
+ 	*extra = (void *) myextra;
+ 
+-	return true;
++/* XXX: original code was : 	return true; */
++	return 1; //true;
+ }
+ 
+ void
+@@ -950,3 +951,4 @@
+ 	/* Otherwise we can just use the GUC string */
+ 	return role_string ? role_string : "none";
+ }
++

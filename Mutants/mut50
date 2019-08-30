@@ -1,0 +1,11 @@
+--- postgres-10.5/src/backend/utils/adt/date.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m050/src/backend/utils/adt/date.c	2019-07-15 12:02:56.000000000 +0200
+@@ -174,7 +174,7 @@
+ 	date = date2j(tm->tm_year, tm->tm_mon, tm->tm_mday) - POSTGRES_EPOCH_JDATE;
+ 
+ 	/* Now check for just-out-of-range dates */
+-	if (!IS_VALID_DATE(date))
++	if (IS_VALID_DATE(date))//mut removed !IS_VALID_DATE(date)
+ 		ereport(ERROR,
+ 				(errcode(ERRCODE_DATETIME_VALUE_OUT_OF_RANGE),
+ 				 errmsg("date out of range: \"%s\"", str)));

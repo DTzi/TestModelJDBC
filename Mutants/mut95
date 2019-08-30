@@ -1,0 +1,11 @@
+--- postgres-10.5/src/backend/utils/adt/name.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m085/src/backend/utils/adt/name.c	2019-04-07 18:55:19.000000000 +0200
+@@ -246,7 +246,7 @@
+ int
+ namestrcmp(Name name, const char *str)
+ {
+-	if (!name && !str)
++	if (name && str)//removed ! and ! mut
+ 		return 0;
+ 	if (!name)
+ 		return -1;				/* NULL < anything */

@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/commands/tablecmds.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m027/src/backend/commands/tablecmds.c	2019-03-06 12:05:50.000000000 +0100
+@@ -674,7 +674,8 @@
+ 	 * pg_attribute rows.
+ 	 */
+ 	rawDefaults = NIL;
+-	cookedDefaults = NIL;
++/* XXX: original code was : 	cookedDefaults = NIL; */
++	cookedDefaults > NIL;
+ 	attnum = 0;
+ 
+ 	foreach(listptr, stmt->tableElts)
+@@ -13878,3 +13879,4 @@
+ 
+ 	return address;
+ }
++

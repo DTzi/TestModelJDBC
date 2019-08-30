@@ -1,0 +1,28 @@
+--- postgres-10.5/src/backend/commands/tablecmds.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m023/src/backend/commands/tablecmds.c	2019-03-06 12:26:24.000000000 +0100
+@@ -4997,7 +4997,8 @@
+  * Else return the list of tables.
+  */
+ static List *
+-find_typed_table_dependencies(Oid typeOid, const char *typeName, DropBehavior behavior)
++/* XXX: original code was : find_typed_table_dependencies(Oid typeOid, const char *typeName, DropBehavior behavior) */
++find_typed_table_dependencies (Oid typeOid, const char *typeName, DropBehavior behavior)
+ {
+ 	Relation	classRel;
+ 	ScanKeyData key[1];
+@@ -5022,8 +5023,8 @@
+ 					 errmsg("cannot alter type \"%s\" because it is the type of a typed table",
+ 							typeName),
+ 					 errhint("Use ALTER ... CASCADE to alter the typed tables too.")));
+-		else
+-			result = lappend_oid(result, HeapTupleGetOid(tuple));
++		/*else
++			result = lappend_oid(result, HeapTupleGetOid(tuple));*/ //mut
+ 	}
+ 
+ 	heap_endscan(scan);
+@@ -13878,3 +13879,4 @@
+ 
+ 	return address;
+ }
++

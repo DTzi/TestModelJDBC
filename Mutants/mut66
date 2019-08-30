@@ -1,0 +1,11 @@
+--- postgres-10.5/src/backend/commands/tablecmds.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m066/src/backend/commands/tablecmds.c	2019-03-06 19:15:41.000000000 +0100
+@@ -5218,7 +5218,7 @@
+ 				 errmsg("cannot recursively add identity column to table that has child tables")));
+ 
+ 	/* skip if the name already exists and if_not_exists is true */
+-	if (!check_for_column_name_collision(rel, colDef->colname, if_not_exists))
++	if (check_for_column_name_collision(rel, colDef->colname, if_not_exists))//mut removed !
+ 	{
+ 		heap_close(attrdesc, RowExclusiveLock);
+ 		heap_freetuple(reltup);

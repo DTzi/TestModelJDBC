@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/commands/tablecmds.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m022/src/backend/commands/tablecmds.c	2019-03-06 12:00:34.000000000 +0100
+@@ -9943,7 +9943,8 @@
+ 	 */
+ 	if (tuple_class->relowner != newOwnerId)
+ 	{
+-		Datum		repl_val[Natts_pg_class];
++/* XXX: original code was : 		Datum		repl_val[Natts_pg_class]; */
++		Datum		repl_val[ -1 + Natts_pg_class];
+ 		bool		repl_null[Natts_pg_class];
+ 		bool		repl_repl[Natts_pg_class];
+ 		Acl		   *newAcl;
+@@ -13878,3 +13879,4 @@
+ 
+ 	return address;
+ }
++

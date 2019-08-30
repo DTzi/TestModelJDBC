@@ -1,0 +1,11 @@
+--- postgres-10.5/src/backend/commands/tablecmds.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m068/src/backend/commands/tablecmds.c	2019-03-06 19:17:28.000000000 +0100
+@@ -5252,7 +5252,7 @@
+ 	/* make sure datatype is legal for a column */
+ 	CheckAttributeType(colDef->colname, typeOid, collOid,
+ 					   list_make1_oid(rel->rd_rel->reltype),
+-					   false);
++					   true);//mut false -> true
+ 
+ 	/* construct new attribute's pg_attribute entry */
+ 	attribute.attrelid = myrelid;

@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/utils/resowner/resowner.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m086/src/backend/utils/resowner/resowner.c	2019-04-07 17:12:16.000000000 +0200
+@@ -374,7 +374,8 @@
+ 	else
+ 	{
+ 		/* Hash: search forward from wherever we were last. */
+-		uint32		mask = resarr->capacity - 1;
++/* XXX: original code was : 		uint32		mask = resarr->capacity - 1; */
++		uint32		mask = resarr->capacity % 1;
+ 
+ 		for (;;)
+ 		{
+@@ -1267,3 +1268,4 @@
+ 	elog(WARNING, "dynamic shared memory leak: segment %u still referenced",
+ 		 dsm_segment_handle(seg));
+ }
++

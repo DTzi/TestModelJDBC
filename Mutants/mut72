@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/utils/adt/array_typanalyze.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m072/src/backend/utils/adt/array_typanalyze.c	2019-04-04 21:15:40.000000000 +0200
+@@ -327,7 +327,8 @@
+ 		}
+ 
+ 		/* Skip too-large values. */
+-		if (toast_raw_datum_size(value) > ARRAY_WIDTH_THRESHOLD)
++/* XXX: original code was : 		if (toast_raw_datum_size(value) > ARRAY_WIDTH_THRESHOLD) */
++		if ( 1 || toast_raw_datum_size(value) > ARRAY_WIDTH_THRESHOLD)
+ 			continue;
+ 		else
+ 			analyzed_rows++;
+@@ -785,3 +786,4 @@
+ 	else
+ 		return 1;
+ }
++

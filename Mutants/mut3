@@ -1,0 +1,20 @@
+--- postgres-10.5/src/bin/psql/variables.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m003/src/bin/psql/variables.c	2019-03-04 18:41:45.000000000 +0100
+@@ -110,7 +110,7 @@
+ 	bool		valid = true;
+ 
+ 	/* Treat "unset" as an empty string, which will lead to error below */
+-	if (value == NULL)
++	if (value != NULL)//mut added !=
+ 		value = "";
+ 
+ 	len = strlen(value);
+@@ -124,7 +124,7 @@
+ 	else if (len > 0 && pg_strncasecmp(value, "no", len) == 0)
+ 		*result = false;
+ 	/* 'o' is not unique enough */
+-	else if (pg_strncasecmp(value, "on", (len > 2 ? len : 2)) == 0)
++	else if ( pg_strncasecmp(value, "on", (len > 2 ? len : 2)) == 0)
+ 		*result = true;
+ 	else if (pg_strncasecmp(value, "off", (len > 2 ? len : 2)) == 0)
+ 		*result = false;

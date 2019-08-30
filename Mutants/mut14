@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/utils/adt/date.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m014/src/backend/utils/adt/date.c	2019-03-05 19:31:53.000000000 +0100
+@@ -2627,7 +2627,8 @@
+ timetz_zone(PG_FUNCTION_ARGS)
+ {
+ 	text	   *zone = PG_GETARG_TEXT_PP(0);
+-	TimeTzADT  *t = PG_GETARG_TIMETZADT_P(1);
++/* XXX: original code was : 	TimeTzADT  *t = PG_GETARG_TIMETZADT_P(1); */
++	TimeTzADT  *t = PG_GETARG_TIMETZADT_P (! 1);
+ 	TimeTzADT  *result;
+ 	int			tz;
+ 	char		tzname[TZ_STRLEN_MAX + 1];
+@@ -2734,3 +2735,4 @@
+ 
+ 	PG_RETURN_TIMETZADT_P(result);
+ }
++

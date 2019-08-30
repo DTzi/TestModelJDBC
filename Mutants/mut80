@@ -1,0 +1,11 @@
+--- postgres-10.5/src/bin/scripts/common.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m080/src/bin/scripts/common.c	2019-04-04 21:42:24.000000000 +0200
+@@ -111,7 +111,7 @@
+ 		new_pass = false;
+ 		conn = PQconnectdbParams(keywords, values, true);
+ 
+-		if (!conn)
++		if (conn)//mut
+ 		{
+ 			fprintf(stderr, _("%s: could not connect to database %s: out of memory\n"),
+ 					progname, dbname);

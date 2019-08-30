@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/utils/adt/date.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m010/src/backend/utils/adt/date.c	2019-03-05 19:21:50.000000000 +0100
+@@ -1946,7 +1946,8 @@
+ Datum
+ timetz_in(PG_FUNCTION_ARGS)
+ {
+-	char	   *str = PG_GETARG_CSTRING(0);
++/* XXX: original code was : 	char	   *str = PG_GETARG_CSTRING(0); */
++	char	   *str = PG_GETARG_CSTRING (! 0);
+ 
+ #ifdef NOT_USED
+ 	Oid			typelem = PG_GETARG_OID(1);
+@@ -2734,3 +2735,4 @@
+ 
+ 	PG_RETURN_TIMETZADT_P(result);
+ }
++

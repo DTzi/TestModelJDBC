@@ -1,0 +1,37 @@
+--- postgres-10.5/src/backend/nodes/makefuncs.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m099/src/backend/nodes/makefuncs.c	2019-04-07 21:29:50.000000000 +0200
+@@ -29,7 +29,8 @@
+  */
+ A_Expr *
+ makeA_Expr(A_Expr_Kind kind, List *name,
+-		   Node *lexpr, Node *rexpr, int location)
++/* XXX: original code was : 		   Node *lexpr, Node *rexpr, int location) */
++		   Node *lexpr, Node *rexpr,  int location)
+ {
+ 	A_Expr	   *a = makeNode(A_Expr);
+ 
+@@ -195,16 +196,16 @@
+ 								 exprCollation(fexpr),
+ 								 varlevelsup);
+ 			}
+-			else
++			/*else//mut
+ 			{
+-				/* func returns scalar, but we want a composite result */
++				/* func returns scalar, but we want a composite result 
+ 				result = makeVar(varno,
+ 								 InvalidAttrNumber,
+ 								 RECORDOID,
+ 								 -1,
+ 								 InvalidOid,
+ 								 varlevelsup);
+-			}
++			}*/
+ 			break;
+ 
+ 		default:
+@@ -611,3 +612,4 @@
+ 	n->location = location;
+ 	return n;
+ }
++

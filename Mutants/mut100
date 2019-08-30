@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/nodes/makefuncs.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m100/src/backend/nodes/makefuncs.c	2019-04-07 21:00:48.000000000 +0200
+@@ -406,7 +406,8 @@
+ 	r->resulttypmod = rtypmod;
+ 	r->resultcollid = rcollid;
+ 	r->relabelformat = rformat;
+-	r->location = -1;
++/* XXX: original code was : 	r->location = -1; */
++	r->location < -1;
+ 
+ 	return r;
+ }
+@@ -611,3 +612,4 @@
+ 	n->location = location;
+ 	return n;
+ }
++

@@ -1,0 +1,29 @@
+--- postgres-10.5/src/backend/commands/alter.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m036/src/backend/commands/alter.c	2019-03-06 14:08:39.000000000 +0100
+@@ -80,9 +80,9 @@
+ 
+ 	switch (classId)
+ 	{
+-		case EventTriggerRelationId:
++		/*case EventTriggerRelationId: //mut
+ 			msgfmt = gettext_noop("event trigger \"%s\" already exists");
+-			break;
++			break;*/
+ 		case ForeignDataWrapperRelationId:
+ 			msgfmt = gettext_noop("foreign-data wrapper \"%s\" already exists");
+ 			break;
+@@ -821,7 +821,8 @@
+ 										   newowner);
+ 
+ 		case OBJECT_EVENT_TRIGGER:
+-			return AlterEventTriggerOwner(strVal((Value *) stmt->object),
++/* XXX: original code was : 			return AlterEventTriggerOwner(strVal((Value *) stmt->object), */
++			return AlterEventTriggerOwner(strVal((Value *) stmt->object),  //AlterEventTriggerOwner(strVal((Value *) stmt->object),
+ 										  newowner);
+ 
+ 		case OBJECT_PUBLICATION:
+@@ -1021,3 +1022,4 @@
+ 
+ 	InvokeObjectPostAlterHook(classId, objectId, 0);
+ }
++

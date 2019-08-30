@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/commands/variable.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m041/src/backend/commands/variable.c	2019-03-06 14:23:37.000000000 +0100
+@@ -699,7 +699,8 @@
+ 	 * InitializeClientEncoding, PrepareClientEncoding will always succeed,
+ 	 * and so will SetClientEncoding; but they won't do anything, which is OK.
+ 	 */
+-	if (PrepareClientEncoding(encoding) < 0)
++/* XXX: original code was : 	if (PrepareClientEncoding(encoding) < 0) */
++	if  (! PrepareClientEncoding(encoding) < 0)
+ 	{
+ 		if (IsTransactionState())
+ 		{
+@@ -950,3 +951,4 @@
+ 	/* Otherwise we can just use the GUC string */
+ 	return role_string ? role_string : "none";
+ }
++

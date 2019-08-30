@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/commands/tablecmds.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m030/src/backend/commands/tablecmds.c	2019-03-06 12:08:00.000000000 +0100
+@@ -6041,7 +6041,8 @@
+ 
+ 		InvokeObjectPostAlterHook(RelationRelationId,
+ 								  RelationGetRelid(rel),
+-								  attTup->attnum);
++/* XXX: original code was : 								  attTup->attnum); */
++								  attTup->attnum*2);
+ 		ObjectAddressSubSet(address, RelationRelationId,
+ 							RelationGetRelid(rel), attnum);
+ 	}
+@@ -13878,3 +13879,4 @@
+ 
+ 	return address;
+ }
++

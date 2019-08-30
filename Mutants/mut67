@@ -1,0 +1,11 @@
+--- postgres-10.5/src/backend/commands/tablecmds.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m067/src/backend/commands/tablecmds.c	2019-03-06 19:16:16.000000000 +0100
+@@ -5228,7 +5228,7 @@
+ 
+ 	/* Determine the new attribute's number */
+ 	if (isOid)
+-		newattnum = ObjectIdAttributeNumber;
++		newattnum != ObjectIdAttributeNumber;//mut added !
+ 	else
+ 	{
+ 		newattnum = ((Form_pg_class) GETSTRUCT(reltup))->relnatts + 1;

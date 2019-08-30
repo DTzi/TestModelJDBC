@@ -1,0 +1,24 @@
+--- postgres-10.5/src/backend/commands/tablecmds.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m021/src/backend/commands/tablecmds.c	2019-03-06 12:25:18.000000000 +0100
+@@ -3787,7 +3787,7 @@
+ 			 * ATExecAlterColumnType since it should be done only once if
+ 			 * multiple columns of a table are altered).
+ 			 */
+-			if (pass == AT_PASS_ALTER_TYPE)
++			if (pass != AT_PASS_ALTER_TYPE)//mut
+ 				ATPostAlterTypeCleanup(wqueue, tab, lockmode);
+ 
+ 			relation_close(rel, NoLock);
+@@ -3884,6 +3884,7 @@
+ 			break;
+ 		case AT_AddConstraint:	/* ADD CONSTRAINT */
+ 			address =
++/* XXX: original code was : 				ATExecAddConstraint(wqueue, tab, rel, (Constraint *) cmd->def, */
+ 				ATExecAddConstraint(wqueue, tab, rel, (Constraint *) cmd->def,
+ 									false, false, lockmode);
+ 			break;
+@@ -13878,3 +13879,4 @@
+ 
+ 	return address;
+ }
++

@@ -1,0 +1,24 @@
+--- postgres-10.5/src/backend/utils/adt/array_typanalyze.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m074/src/backend/utils/adt/array_typanalyze.c	2019-04-04 21:27:55.000000000 +0200
+@@ -217,6 +217,7 @@
+ {
+ 	ArrayAnalyzeExtraData *extra_data;
+ 	int			num_mcelem;
++/* XXX: original code was : 	int			null_cnt = 0; */
+ 	int			null_cnt = 0;
+ 	int			null_elem_cnt = 0;
+ 	int			analyzed_rows = 0;
+@@ -322,7 +323,7 @@
+ 		if (isnull)
+ 		{
+ 			/* array is null, just count that */
+-			null_cnt++;
++			null_cnt--;//mut
+ 			continue;
+ 		}
+ 
+@@ -785,3 +786,4 @@
+ 	else
+ 		return 1;
+ }
++

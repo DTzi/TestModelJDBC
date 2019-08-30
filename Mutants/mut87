@@ -1,0 +1,26 @@
+--- postgres-10.5/src/backend/utils/resowner/resowner.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m087/src/backend/utils/resowner/resowner.c	2019-04-07 17:28:11.000000000 +0200
+@@ -1105,7 +1105,8 @@
+  * Caller must have previously done ResourceOwnerEnlargeTupleDescs()
+  */
+ void
+-ResourceOwnerRememberTupleDesc(ResourceOwner owner, TupleDesc tupdesc)
++/* XXX: original code was : ResourceOwnerRememberTupleDesc(ResourceOwner owner, TupleDesc tupdesc) */
++ResourceOwnerRememberTupleDesc (ResourceOwner owner, TupleDesc tupdesc)
+ {
+ 	ResourceArrayAdd(&(owner->tupdescarr), PointerGetDatum(tupdesc));
+ }
+@@ -1116,7 +1117,7 @@
+ void
+ ResourceOwnerForgetTupleDesc(ResourceOwner owner, TupleDesc tupdesc)
+ {
+-	if (!ResourceArrayRemove(&(owner->tupdescarr), PointerGetDatum(tupdesc)))
++	if (ResourceArrayRemove(&(owner->tupdescarr), PointerGetDatum(tupdesc)))//XXX: original code was : !
+ 		elog(ERROR, "tupdesc reference %p is not owned by resource owner %s",
+ 			 tupdesc, owner->name);
+ }
+@@ -1267,3 +1268,4 @@
+ 	elog(WARNING, "dynamic shared memory leak: segment %u still referenced",
+ 		 dsm_segment_handle(seg));
+ }
++

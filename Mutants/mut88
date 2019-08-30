@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/utils/resowner/resowner.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m088/src/backend/utils/resowner/resowner.c	2019-04-07 17:13:36.000000000 +0200
+@@ -363,7 +363,8 @@
+ static bool
+ ResourceArrayGetAny(ResourceArray *resarr, Datum *value)
+ {
+-	if (resarr->nitems == 0)
++/* XXX: original code was : 	if (resarr->nitems == 0) */
++	if  (! resarr->nitems == 0)
+ 		return false;
+ 
+ 	if (RESARRAY_IS_ARRAY(resarr))
+@@ -1267,3 +1268,4 @@
+ 	elog(WARNING, "dynamic shared memory leak: segment %u still referenced",
+ 		 dsm_segment_handle(seg));
+ }
++

@@ -1,0 +1,24 @@
+--- postgres-10.5/src/backend/catalog/dropcmds.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m031/src/backend/catalog/dropcmds.c	2019-03-06 13:48:26.000000000 +0100
+@@ -61,6 +61,7 @@
+ 	foreach(cell1, stmt->objects)
+ 	{
+ 		ObjectAddress address;
++/* XXX: original code was : 		Node	   *object = lfirst(cell1); */
+ 		Node	   *object = lfirst(cell1);
+ 		Relation	relation = NULL;
+ 		Oid			namespaceId;
+@@ -89,7 +90,7 @@
+ 		 * happy to operate on an aggregate as on any other function, we have
+ 		 * historically not allowed this for DROP FUNCTION.
+ 		 */
+-		if (stmt->removeType == OBJECT_FUNCTION)
++		if (stmt->removeType != OBJECT_FUNCTION)//mut
+ 		{
+ 			Oid			funcOid = address.objectId;
+ 			HeapTuple	tup;
+@@ -464,3 +465,4 @@
+ 	else
+ 		ereport(NOTICE, (errmsg(msg, name, args)));
+ }
++

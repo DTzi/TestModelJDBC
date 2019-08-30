@@ -1,0 +1,26 @@
+--- postgres-10.5/src/backend/utils/adt/array_typanalyze.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m075/src/backend/utils/adt/array_typanalyze.c	2019-04-04 21:29:06.000000000 +0200
+@@ -713,7 +713,7 @@
+ 	Datum		h;
+ 
+ 	h = FunctionCall1Coll(array_extra_data->hash, DEFAULT_COLLATION_OID, d);
+-	return DatumGetUInt32(h);
++	return !DatumGetUInt32(h);//mut
+ }
+ 
+ /*
+@@ -735,7 +735,8 @@
+  * XXX consider using SortSupport infrastructure
+  */
+ static int
+-element_compare(const void *key1, const void *key2)
++/* XXX: original code was : element_compare(const void *key1, const void *key2) */
++element_compare (const void *key1, const void *key2)
+ {
+ 	Datum		d1 = *((const Datum *) key1);
+ 	Datum		d2 = *((const Datum *) key2);
+@@ -785,3 +786,4 @@
+ 	else
+ 		return 1;
+ }
++

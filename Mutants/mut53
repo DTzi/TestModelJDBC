@@ -1,0 +1,11 @@
+--- postgres-10.5/src/backend/utils/adt/name.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m053/src/backend/utils/adt/name.c	2019-03-06 18:26:35.000000000 +0100
+@@ -230,7 +230,7 @@
+ 			   *q;
+ 
+ 	if (!name || !str)
+-		return -1;
++		return 1;//mut removed -
+ 	for (i = 0, p = NameStr(*name); i < NAMEDATALEN && *p; ++i, ++p)
+ 		;
+ 	for (q = str; i < NAMEDATALEN; ++i, ++p, ++q)

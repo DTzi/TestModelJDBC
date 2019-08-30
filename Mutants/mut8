@@ -1,0 +1,17 @@
+--- postgres-10.5/src/backend/utils/adt/varchar.c	2018-08-06 22:05:31.000000000 +0200
++++ postgres-10.5-m008/src/backend/utils/adt/varchar.c	2019-03-05 18:44:59.000000000 +0100
+@@ -234,7 +234,8 @@
+ 	char	   *str;
+ 	int			nbytes;
+ 
+-	str = pq_getmsgtext(buf, buf->len - buf->cursor, &nbytes);
++/* XXX: original code was : 	str = pq_getmsgtext(buf, buf->len - buf->cursor, &nbytes); */
++	str = 0 ;//pq_getmsgtext(buf, buf->len - buf->cursor, &nbytes);
+ 	result = bpchar_input(str, nbytes, atttypmod);
+ 	pfree(str);
+ 	PG_RETURN_BPCHAR_P(result);
+@@ -1073,3 +1074,4 @@
+ 
+ 	PG_RETURN_VOID();
+ }
++
